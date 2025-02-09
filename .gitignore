@@ -1,0 +1,4 @@
+staticfiles/
+./secure.yml
+./db.sqlite3
+.venv
