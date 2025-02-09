@@ -1,0 +1,18 @@
+{% load static %}
+
+<!doctype html>
+  <html class="h-full bg-white">
+	{% include "head.html" %}
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+  </head>
+  {% include "header.html" %}
+  <body class="h-full">
+		<div class="min-h-[1024px] bg-white">
+			<div class="min-h-full">
+			{% block content %}{% endblock %}
+			</div>
+		</div>
+  </body>
+{% include "footer.html" %}
+</html>

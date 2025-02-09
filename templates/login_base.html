@@ -1,0 +1,15 @@
+{% load static %}
+
+<!doctype html>
+  <html lang="ja-jp">
+	{% include "head.html" %}
+  <head>
+    <title>{% block title %}{% endblock %}</title>
+		{% block header_extra %}{% endblock %}
+  </head>
+  {% include "login_header.html" %}
+  <body class="">
+			{% block content %}{% endblock %}
+  </body>
+{% include "login_footer.html" %}
+</html>

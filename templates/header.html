@@ -1,0 +1,122 @@
+{% load static %}
+{% include "head.html" %}
+<!-- Navbar -->
+    <nav x-data="{ open: false }" class="bg-gray-50">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="relative flex h-16 items-center justify-between border-b border-gray-200">
+          <div class="flex items-center">
+            <div class="flex-shrink-0">
+              <img class="h-8 w-auto" src="https://tailwindui.com/img/logos/mark.svg?color=violet&amp;shade=500" alt="つなコンシェル（ロゴを作る）">
+            </div>
+
+            <!-- Links section -->
+            <div class="hidden lg:ml-10 lg:block">
+              <div class="flex space-x-4">
+								<a href="#" class="hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium text-gray-900">ログイン</a>
+								<a href="#" class="hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium text-gray-900">登録</a>
+								<a href="#" class="hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium text-gray-900">サービス内容</a>
+								<a href="#" class="hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium text-gray-900">プライバシーポリシー</a>
+								<a href="#" class="hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium text-gray-900">利用規約</a>
+								<a href="#" class="hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium text-gray-900">料金プラン</a>
+								<a href="#" class="hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium text-gray-900">セキュリティに関して</a>
+								<a href="#" class="hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium text-gray-900">資料請求</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex lg:hidden">
+            <!-- Mobile menu button -->
+            <button type="button" class="inline-flex items-center justify-center rounded-md bg-gray-50 p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-50" aria-controls="mobile-menu" @click="open = !open" aria-expanded="false" x-bind:aria-expanded="open.toString()">
+              <span class="sr-only">Open main menu</span>
+              <svg x-state:on="Menu open" x-state:off="Menu closed" class="block h-6 w-6" :class="{ 'hidden': open, 'block': !(open) }" x-description="Heroicon name: outline/bars-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
+</svg>
+              <svg x-state:on="Menu open" x-state:off="Menu closed" class="hidden h-6 w-6" :class="{ 'block': open, 'hidden': !(open) }" x-description="Heroicon name: outline/x-mark" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+</svg>
+            </button>
+          </div>
+
+          <!-- Actions section -->
+          <div class="hidden lg:ml-4 lg:block">
+						<!-- Profile dropdown -->
+            <div class="flex items-center justify-center h-screen bg-gray-100">
+							<div x-data="{ open: false }" class="relative inline-block text-left">
+								<button @click="open = !open" class="inline-flex justify-center w-full px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-gray-100 focus:ring-blue-500"> Menu <svg class="h-5 w-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+									</svg>
+								</button>
+								<div x-show="open" @click.away="open = false" class="origin-top-left absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 px-2 py-2">
+									<a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md">Save</a>
+									<div x-data="{ subMenuOpen: false }" class="relative">
+										<button @click="subMenuOpen = !subMenuOpen" class="flex justify-between items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 relative rounded-md"> Share to <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="h-5 w-5 ml-2" transform="matrix(1, 0, 0, 1, 0, 0)rotate(270)">
+												<g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+												<g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
+												<g id="SVGRepo_iconCarrier">
+													<g id="Layer_2" data-name="Layer 2">
+														<g id="invisible_box" data-name="invisible box">
+															<rect width="48" height="48" fill="none"></rect>
+														</g>
+														<g id="icons_Q2" data-name="icons Q2">
+															<path d="M24,27.2,13.4,16.6a1.9,1.9,0,0,0-3,.2,2.1,2.1,0,0,0,.2,2.7l12,11.9a1.9,1.9,0,0,0,2.8,0l12-11.9a2.1,2.1,0,0,0,.2-2.7,1.9,1.9,0,0,0-3-.2Z"></path>
+														</g>
+													</g>
+												</g>
+											</svg>
+										</button>
+										<div x-show="subMenuOpen" @click.away="subMenuOpen = false" class="absolute top-0 left-full ml-4 w-full rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 px-2 py-2">
+											<a target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Ftailwindcomponents.com%2Fu%2Fdhaifullah&amp;text=" class="flex px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Twitter</a>
+											<!-- Add more sub-menu items as needed -->
+										</div>
+									</div>
+									<a href="#" class="block px-4 py-2 text-sm text-red-500 hover:bg-red-100 rounded-md">Report</a>
+								</div>
+							</div>
+            </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div x-description="Mobile menu, show/hide based on menu state." class="border-b border-gray-200 bg-gray-50 lg:hidden" id="mobile-menu" x-show="open">
+        <div class="space-y-1 px-2 pt-2 pb-3">
+
+            <a href="#" class="bg-gray-100 block px-3 py-2 rounded-md font-medium text-gray-900" aria-current="page" x-state:on="Current" x-state:off="Default" x-state-description="Current: &quot;bg-gray-100&quot;, Default: &quot;hover:bg-gray-100&quot;">Dashboard</a>
+
+            <a href="#" class="hover:bg-gray-100 block px-3 py-2 rounded-md font-medium text-gray-900" x-state-description="undefined: &quot;bg-gray-100&quot;, undefined: &quot;hover:bg-gray-100&quot;">Jobs</a>
+
+            <a href="#" class="hover:bg-gray-100 block px-3 py-2 rounded-md font-medium text-gray-900" x-state-description="undefined: &quot;bg-gray-100&quot;, undefined: &quot;hover:bg-gray-100&quot;">Applicants</a>
+
+            <a href="#" class="hover:bg-gray-100 block px-3 py-2 rounded-md font-medium text-gray-900" x-state-description="undefined: &quot;bg-gray-100&quot;, undefined: &quot;hover:bg-gray-100&quot;">Company</a>
+
+        </div>
+        <div class="border-t border-gray-200 pt-4 pb-3">
+          <div class="flex items-center px-5">
+            <div class="flex-shrink-0">
+              <img class="h-10 w-10 rounded-full" src="https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&amp;ixid=eyJhcHBfaWQiOjEyMDd9&amp;auto=format&amp;fit=facearea&amp;facepad=2&amp;w=256&amp;h=256&amp;q=80" alt="">
+            </div>
+            <div class="ml-3">
+              <div class="text-base font-medium text-gray-800">Whitney Francis</div>
+              <div class="text-sm font-medium text-gray-500">whitney.francis@example.com</div>
+            </div>
+            <button type="button" class="ml-auto flex-shrink-0 rounded-full bg-gray-50 p-1 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 focus:ring-offset-gray-50">
+              <span class="sr-only">View notifications</span>
+              <svg class="h-6 w-6" x-description="Heroicon name: outline/bell" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"></path>
+</svg>
+            </button>
+          </div>
+          <div class="mt-3 space-y-1 px-2">
+
+              <a href="#" class="block rounded-md py-2 px-3 text-base font-medium text-gray-900 hover:bg-gray-100">Your Profile</a>
+
+              <a href="#" class="block rounded-md py-2 px-3 text-base font-medium text-gray-900 hover:bg-gray-100">Settings</a>
+
+              <a href="#" class="block rounded-md py-2 px-3 text-base font-medium text-gray-900 hover:bg-gray-100">Sign out</a>
+
+          </div>
+        </div>
+      </div>
+    </nav>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success</title>
+    <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+</head>
+<body>
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold">Success</h1>
+        <p>Your payment status has been successfully saved.</p>
+        <a href="{% url 'customer_payment_status_create' %}" class="text-blue-500">Add Another Payment Status</a>
+    </div>
+</body>
+</html>

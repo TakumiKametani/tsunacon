@@ -1,0 +1,54 @@
+{% extends 'login_base.html' %}
+{% block title %}資料請求フォーム{% endblock %}
+
+{% block content %}
+<div class="w-full px-8 py-10 mx-auto overflow-hidden bg-white rounded-lg shadow-2xl dark:bg-gray-900 lg:max-w-xl shadow-gray-300/50 dark:shadow-black/50">
+                            <h1 class="text-lg font-medium text-gray-700">資料請求フォーム</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label for="first_name" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">{{ form.first_name.label }}</label>
+                {{ form.first_name }}
+            </div>
+            <div class="mb-4">
+                <label for="last_name" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">{{ form.last_name.label }}</label>
+                {{ form.last_name }}
+            </div>
+            <div class="mb-4">
+                <label for="first_name_kana" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">{{ form.first_name_kana.label }}</label>
+                {{ form.first_name_kana }}
+            </div>
+            <div class="mb-4">
+                <label for="last_name_kana" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">{{ form.last_name_kana.label }}</label>
+                {{ form.last_name_kana }}
+            </div>
+            <div class="mb-4">
+                <label for="email" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">{{ form.email.label }}</label>
+                {{ form.email }}
+            </div>
+            <div class="mb-4">
+                <label for="phone" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">{{ form.phone.label }}</label>
+                {{ form.phone }}
+            </div>
+            <div class="mb-4">
+                <label for="postal_code" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">{{ form.postal_code.label }}</label>
+                {{ form.postal_code }}
+            </div>
+            <div class="mb-4">
+                <label for="address_1" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">{{ form.address_1.label }}</label>
+                {{ form.address_1 }}
+            </div>
+            <div class="mb-4">
+                <label for="address_2" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">{{ form.address_2.label }}</label>
+                {{ form.address_2 }}
+            </div>
+            <div class="mb-4">
+                <label for="message" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">{{ form.message.label }}</label>
+                {{ form.message }}
+            </div>
+            <div class="flex items-center justify-between">
+                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">送信</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

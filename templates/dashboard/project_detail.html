@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block title %}Project Detail{% endblock %}
+{% block content %}
+<h1 class="text-2xl font-bold">{{ object.name }}</h1>
+<p>{{ object.description }}</p>
+<p>Grade: {{ object.grade.name }} ({{ object.grade.price }})</p>
+<p>Client: {{ object.client_name }}</p>
+<p>Address: {{ object.client_address }}</p>
+<p>Start Date: {{ object.start_date }}</p>
+<p>End Date: {{ object.end_date }}</p>
+<p>Amount: {{ object.amount }}</p>
+
+<a href="{% url 'project_edit' object.pk %}" class="text-blue-500">Edit Project</a>
+<a href="{% url 'project_list' %}" class="text-blue-500">Back to List</a>
+<div>
+	<!-- チャットメッセージ一覧 -->
+	<div id="chat-messages">
+		{% for message in project.chatmessage_set.all %}
+		<div class="chat-message" data-message-id="{{ message.id }}">
+			<p><strong>{{ message.user.username }}:</strong> {{ message.content }}</p>
+			<button class="edit-message" data-message-id="{{ message.id }}">Edit</button>
+			<button class="delete-message" data-message-id="{{ message.id }}">Delete</button>
+		</div>
+		{% endfor %}
+	</div>
+
+	<!-- チャットメッセージ作成フォーム -->
+	<form id="chat-message-form" method="post">
+		{% csrf_token %}
+		<textarea name="content" id="chat-message-content" rows="3" placeholder="Enter your message"></textarea>
+		<input type="hidden" name="project_id" value="{{ project.id }}">
+		<button type="submit">Send</button>
+	</form>
+</div>
+
+<script>
+	$(document).ready(function() {
+		$('#chat-message-form').on('submit', function(e) {
+			e.preventDefault();
+			$.ajax({
+				type: 'POST',
+				url: '{% url "chat_message_create" %}',
+				data: $(this).serialize(),
+				success: function(response) {
+					if (response.status === 'success') {
+						// メッセージが正常に作成された場合の処理
+						alert(response.message);
+					} else {
+						// エラーメッセージの表示
+						alert(response.errors);
+					}
+				}
+			});
+		});
+
+		$('.edit-message').on('click', function() {
+			var messageId = $(this).data('message-id');
+			var content = $(this).siblings('p').text();
+			$('#chat-message-content').val(content);
+			$('#chat-message-form').attr('action', '{% url "chat_message_update" 0 %}'.replace('0', messageId));
+		});
+
+		$('.delete-message').on('click', function() {
+			if (confirm('Are you sure you want to delete this message?')) {
+				var messageId = $(this).data('message-id');
+				$.ajax({
+					type: 'POST',
+					url: '{% url "chat_message_delete" 0 %}'.replace('0', messageId),
+					data: {
+						'csrfmiddlewaretoken': '{{ csrf_token }}'
+					},
+					success: function(response) {
+						if (response.status === 'success') {
+							// メッセージが正常に削除された場合の処理
+							alert(response.message);
+							$('.chat-message[data-message-id="' + messageId + '"]').remove();
+						} else {
+							// エラーメッセージの表示
+							alert(response.errors);
+						}
+					}
+				});
+			}
+		});
+	});
+</script>
+{% endblock %}
