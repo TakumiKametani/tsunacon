@@ -84,4 +84,144 @@
 		});
 	});
 </script>
+    <div x-data="chatApp()" class="container mx-auto p-4 h-screen flex flex-col">
+        <div class="flex-1 bg-white shadow-lg rounded-lg flex overflow-hidden">
+            <!-- サイドバー -->
+            <div class="w-1/4 bg-gray-50 border-r border-gray-200 p-4 overflow-y-auto">
+                <h2 class="text-xl font-bold mb-4">プロジェクト概要</h2>
+                <p class="mb-2">プロジェクト名: ウェブアプリ開発</p>
+                <p class="mb-2">開始日: 2023年6月1日</p>
+                <p class="mb-2">終了予定日: 2023年12月31日</p>
+                <p class="mb-4">進捗状況: 35%</p>
+                
+                <h3 class="text-lg font-semibold mb-2">メンバー一覧</h3>
+                <ul>
+                    <template x-for="member in members" :key="member">
+                        <li class="flex items-center space-x-2 mb-2">
+                            <span class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold" x-text="member.charAt(0)"></span>
+                            <span x-text="member"></span>
+                        </li>
+                    </template>
+                </ul>
+            </div>
+            
+            <!-- チャットエリア -->
+            <div class="flex-1 flex flex-col">
+                <!-- メッセージ一覧 -->
+                <div class="flex-1 overflow-y-auto p-4" id="chat-messages">
+                    <template x-for="message in messages" :key="message.id">
+                        <div :class="{'flex flex-row-reverse': message.sender === 'self', 'flex': message.sender !== 'self'}" class="mb-4">
+                            <div :class="{'bg-blue-500 text-white': message.sender === 'self', 'bg-gray-200': message.sender !== 'self'}" class="max-w-xs mx-2 py-2 px-4 rounded-lg shadow">
+                                <div x-show="message.replyTo" class="text-xs text-gray-500 mb-1" x-text="'返信先: ' + message.replyTo"></div>
+                                <div x-html="linkifyHtml(message.text)" class="break-words"></div>
+                                <div x-show="message.file" class="mt-2">
+                                    <a :href="message.file" target="_blank" class="text-sm text-blue-600 underline">添付ファイル</a>
+                                </div>
+                                <div x-show="message.preview" class="mt-2 bg-white rounded p-2">
+                                    <img :src="message.preview" alt="URL Preview" class="w-full h-auto">
+                                </div>
+                                <div class="text-xs mt-1 text-right" x-text="message.time"></div>
+                            </div>
+                            <div class="flex flex-col justify-end">
+                                <button @click="replyTo(message)" class="text-xs text-gray-500 hover:text-gray-700">返信</button>
+                                <button @click="copyMessage(message.text)" class="text-xs text-gray-500 hover:text-gray-700 mt-1">コピー</button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+                
+                <!-- メッセージ入力エリア -->
+                <div class="bg-gray-100 p-4">
+                    <div x-show="replyingTo" class="bg-gray-200 p-2 rounded mb-2">
+                        <p class="text-sm">返信先: <span x-text="replyingTo"></span></p>
+                        <button @click="cancelReply" class="text-xs text-red-500">キャンセル</button>
+                    </div>
+                    <div class="flex space-x-2">
+                        <input type="text" x-model="newMessage" @keyup.enter="sendMessage" placeholder="メッセージを入力..." class="flex-1 rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <input type="file" @change="handleFileUpload" class="hidden" id="file-upload">
+                        <button @click="() => document.getElementById('file-upload').click()" class="bg-gray-300 hover:bg-gray-400 rounded-full p-2">
+                            📎
+                        </button>
+                        <button @click="sendMessage" class="bg-blue-500 text-white rounded-full py-2 px-4 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500">送信</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function chatApp() {
+            return {
+                members: ['田中太郎', '佐藤花子', '鈴木一郎', '高橋美咲', '伊藤健太'],
+                messages: [
+                    { id: 1, sender: 'other', text: 'こんにちは', time: '10:00' },
+                    { id: 2, sender: 'self', text: 'プロジェクトの進捗はどうですか？', time: '10:05' },
+                    { id: 3, sender: 'other', text: '順調です。今週中に報告書を提出します。', time: '10:10' }
+                ],
+                newMessage: '',
+                replyingTo: null,
+                handleFileUpload(event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.sendMessage(e.target.result, file.name);
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                },
+                sendMessage(fileContent = null, fileName = null) {
+                    if (this.newMessage.trim() === '' && !fileContent) return;
+                    
+                    const message = {
+                        id: this.messages.length + 1,
+                        sender: 'self',
+                        text: this.newMessage,
+                        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                        replyTo: this.replyingTo
+                    };
+
+                    if (fileContent) {
+                        message.file = fileContent;
+                        message.text = fileName || 'ファイルがアップロードされました';
+                    }
+
+                    // URLプレビューの処理
+                    const urlRegex = /(https?:\/\/[^\s]+)/g;
+                    const urls = message.text.match(urlRegex);
+                    if (urls && urls.length > 0) {
+                        // 注意: 実際のアプリケーションでは、サーバーサイドでURLのプレビューを生成する必要があります
+                        message.preview = 'https://via.placeholder.com/150?text=URL+Preview';
+                    }
+
+                    this.messages.push(message);
+                    this.newMessage = '';
+                    this.replyingTo = null;
+                    this.$nextTick(() => {
+                        this.scrollToBottom();
+                    });
+                },
+                replyTo(message) {
+                    this.replyingTo = message.text.substring(0, 20) + '...';
+                },
+                cancelReply() {
+                    this.replyingTo = null;
+                },
+                copyMessage(text) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        alert('メッセージをコピーしました');
+                    });
+                },
+                scrollToBottom() {
+                    const chatMessages = document.getElementById('chat-messages');
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                },
+                linkifyHtml(text) {
+                    return linkifyHtml(text, {
+                        defaultProtocol: 'https'
+                    });
+                }
+            }
+        }
+    </script>
 {% endblock %}

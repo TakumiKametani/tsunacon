@@ -60,4 +60,14 @@
 ![Runserver](static/image/runserver.png)
 4. 保存して設定を完了します。
 
-以上で環境構築の手順は完了です。これで開発を開始する準備が整いました。
+### 10. secure.ymlの配置
+
+tsunacon\secure.yml
+※ファイルの中身は別途配布
+
+### 11. テーブル作成
+
+```sh
+python manage.py migrations
+```
+
