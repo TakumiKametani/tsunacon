@@ -33,8 +33,23 @@ class EmailAuthenticationForm(AuthenticationForm):
 
 
 class LoginForm(AuthenticationForm):
-    email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'autofocus': True}))
     """ログインフォーム"""
+    email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={
+        'class': 'form-control',
+        'id': 'floatingInput',
+        'placeholder': 'name@example.com',
+        'autofocus': True
+    }))
+    password = forms.CharField(label='Password', widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+        'id': 'floatingPassword',
+        'placeholder': 'Password'
+    }))
+    remember_me = forms.BooleanField(required=False, widget=forms.CheckboxInput(attrs={
+        'class': 'form-check-input',
+        'id': 'flexCheckDefault'
+    }))
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # 'username' フィールドを削除
@@ -42,16 +57,7 @@ class LoginForm(AuthenticationForm):
         # フィールドの順序を再設定
         self.fields['email'] = self.fields.pop('email')
         self.fields['password'] = self.fields.pop('password')
-        for field_name, field in self.fields.items():
-            field.widget.attrs["class"] = "shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-            field.widget.attrs["placeholder"] = self.add_placeholder(field_name)
-
-    def add_placeholder(self, field_name):
-        placeholders = {
-            'email': 'your@email.com',
-            'password': 'Enter your password',
-        }
-        return placeholders.get(field_name, '')
+        self.fields['remember_me'] = self.fields.pop('remember_me')
 
     def clean(self):
         email = self.cleaned_data.get('email')

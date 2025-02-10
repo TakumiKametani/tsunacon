@@ -39,12 +39,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'axes',
     'encrypted_model_fields',
+    'django_bootstrap5',
 ]
 
 INSTALLED_APPS += [
     'account',
     'material_request',
-    'dashboard'
+    'dashboard',
 ]
 
 MIDDLEWARE = [

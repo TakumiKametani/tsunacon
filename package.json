@@ -1,14 +1,15 @@
 {
   "devDependencies": {
     "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
     "postcss": "^8.5.1",
-    "tailwindcss": "^4.0.5",
-    "tailwindcss-cli": "^0.1.2"
+    "rimraf": "^6.0.1"
   },
   "name": "tsunacon",
   "version": "1.0.0",
   "main": "tailwind.config.js",
   "dependencies": {
+    "@tailwindcss/cli": "^4.0.5",
     "alpinejs": "^3.14.8",
     "ansi-regex": "^6.1.0",
     "ansi-styles": "^6.2.1",
@@ -82,6 +83,7 @@
     "postcss-js": "^4.0.1",
     "postcss-load-config": "^6.0.1",
     "postcss-nested": "^7.0.2",
+    "postcss-scss": "^4.0.9",
     "postcss-selector-parser": "^7.1.0",
     "postcss-value-parser": "^4.2.0",
     "queue-microtask": "^1.2.3",
@@ -100,6 +102,7 @@
     "strip-ansi-cjs": "^8.0.0",
     "sucrase": "^3.35.0",
     "supports-preserve-symlinks-flag": "^1.0.0",
+    "tailwindcss": "^4.0.5",
     "thenify": "^3.3.1",
     "thenify-all": "^1.6.0",
     "to-regex-range": "^5.0.1",
@@ -111,10 +114,12 @@
     "wrap-ansi-cjs": "^8.0.0",
     "yaml": "^2.7.0"
   },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tailwindcss build ./static/css/tailwind.css -o ./static/css/style.css && cleancss -o ./static/css/style.min.css ./static/css/style.css"
-  },
+"scripts": {
+    "build:clean": "rimraf ../static/css/dist",
+    "build:tailwind": "cross-env NODE_ENV=production npx tailwindcss --postcss -i ./src/styles.css -o ../static/css/dist/styles.css --minify",
+    "build": "npm run build:clean && npm run build:tailwind"
+},
+
   "keywords": [],
   "author": "",
   "license": "ISC",

@@ -1,20 +1,20 @@
 {% load static %}
+{% load django_bootstrap5 %}
 
 <!doctype html>
-  <html class="h-full bg-white">
-	{% include "head.html" %}
+<html lang="ja-jp">
   <head>
+    {% include "head.html" %}
     <title>{% block title %}{% endblock %}</title>
+    {% bootstrap_css %}
+    {% block header_extra %}{% endblock %}
   </head>
-  {% include "header.html" %}
-  <body class="h-full">
-		<div class="min-h-[1024px] bg-white">
-			<div class="min-h-full">
-				<main class="pt-16">
-			{% block content %}{% endblock %}
-				</main>
-			</div>
-		</div>
+  <body>
+    {% include "login_header.html" %}
+    <main class="d-flex align-items-center justify-content-center min-vh-100">
+      {% block content %}{% endblock %}
+    </main>
+    {% include "login_footer.html" %}
+    {% bootstrap_javascript %}
   </body>
-{% include "footer.html" %}
 </html>

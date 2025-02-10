@@ -1,50 +1,314 @@
 {% extends 'base.html' %}
-{% block content %}
-<div class="bg-blue-500 text-white p-4">
-  TailwindCSS が適用されています！
-</div>
+{% block header_extra %}
+  <style>
+    /* ベースのカスタムスタイル */
+    body {
+      background-color: #f7f7f7;
+      font-family: 'Arial', sans-serif;
+    }
 
-<h1 class="text-2xl font-bold">案件一覧</h1>
-<div class="shadow-lg rounded-lg overflow-hidden mx-4 md:mx-10">
-    <table class="w-full table-fixed">
-        <thead>
-            <tr class="bg-gray-100">
-                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">案件名</th>
-                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">案件概要</th>
-                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">ご担当者様</th>
-                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">開始日</th>
-                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">終了日</th>
-                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">ステータス</th>
-            </tr>
-        </thead>
-				<tbody>
-            <tr>
-                <td class="py-4 px-6 border-b border-gray-200">サンプル案件</td>
-                <td class="py-4 px-6 border-b border-gray-200 truncate">サンプルのため、HTMLにべた書きしている。データができたら削除をしていく。</td>
-                <td class="py-4 px-6 border-b border-gray-200">鈴木　一郎　様</td>
-                <td class="py-4 px-6 border-b border-gray-200">2025/2/10</td>
-                <td class="py-4 px-6 border-b border-gray-200">2025/2/20</td>
-                <td class="py-4 px-6 border-b border-gray-200">
-                    <span class="bg-red-500 text-white py-1 px-2 rounded-full text-xs">遂行中</span>
-                    <span class="bg-gray-500 text-white py-1 px-2 rounded-full text-xs">下書き</span>
-                    <span class="bg-yellow-500 text-white py-1 px-2 rounded-full text-xs">未遂行</span>
-                    <span class="bg-amber-500 text-white py-1 px-2 rounded-full text-xs">レビュー依頼</span>
-                    <span class="bg-purple-500 text-white py-1 px-2 rounded-full text-xs">完了</span>
-                </td>
-            </tr>
-						{% for project in projects %}
-						<tr>
-								<td class="py-2">{{ project.name }}</td>
-								<td class="py-2">{{ project.description }}</td>
-								<td class="py-2">{{ project.customer.name }}</td>
-								<td class="py-2">{{ project.start_date }}</td>
-								<td class="py-2">{{ project.end_date }}</td>
-								<td class="py-2">{{ project.get_status_display }}</td>
-						</tr>
-						{% endfor %}
-				</tbody>
-    </table>
-</div>
+    table {
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
 
+    .table thead {
+      background: linear-gradient(135deg, #ff7eb9, #feb2d8);
+      color: white;
+      text-align: center;
+    }
+
+    th {
+      font-weight: bold;
+      padding: 12px 20px;
+      cursor: pointer; /* ソート可能にする */
+    }
+
+    td {
+      background-color: #fff;
+      text-align: center;
+      padding: 12px 20px;
+    }
+
+    tr:hover {
+      background-color: #ffe6f2;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .status-icon {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 50px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .status-progress {
+      background-color: #28a745; /* 緑色 */
+    }
+
+    .status-draft {
+      background-color: #6c757d; /* 灰色 */
+    }
+
+    .status-complete {
+      background-color: #007bff; /* 青色 */
+    }
+
+    .table-responsive {
+      margin: 20px 0;
+    }
+
+    .status-counts {
+      margin-bottom: 20px;
+    }
+
+    .status-counts span {
+      font-size: 1.1em;
+      margin-right: 15px;
+      font-weight: bold;
+    }
+
+  </style>
 {% endblock %}
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-center mb-4">プロジェクト案件一覧</h2>
 
+  <!-- 検索ボックス -->
+  <div class="search-box">
+    <input type="text" id="searchInput" class="form-control" placeholder="案件名や担当者で検索..." onkeyup="searchTable()">
+  </div>
+
+  <!-- ステータスごとの件数表示 -->
+  <div class="status-counts">
+    <div class="d-inline status-progress-count">
+      <span class="status-icon status-progress">進行中</span>
+      <span id="progressCount">0</span>件
+    </div>
+    <div class="d-inline status-draft-count">
+      <span class="status-icon status-draft">下書</span>
+      <span id="draftCount">0</span>件
+    </div>
+    <div class="d-inline status-complete-count">
+      <span class="status-icon status-complete">完了</span>
+      <span id="completeCount">0</span>件
+    </div>
+  </div>
+
+<!-- 表示件数切り替えドロップダウン -->
+<div class="rows-per-page mb-3">
+  <label for="rowsPerPage" class="form-label">表示件数:</label>
+  <select id="rowsPerPage" class="form-select" onchange="updateTableDisplay()">
+    <option value="1">1件</option>
+    <option value="10">10件</option>
+    <option value="15">15件</option>
+    <option value="20">20件</option>
+  </select>
+</div>
+	
+  <div class="table-responsive">
+    <table class="table table-striped" id="projectTable">
+      <thead>
+        <tr>
+          <th scope="col" onclick="sortTable(0)">案件名</th>
+          <th scope="col" onclick="sortTable(1)">案件概要</th>
+          <th scope="col" onclick="sortTable(2)">開始日</th>
+          <th scope="col" onclick="sortTable(3)">終了日</th>
+          <th scope="col" onclick="sortTable(4)">担当</th>
+          <th scope="col" onclick="sortTable(5)">ステータス</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-status="進行中">
+          <td><a href="#" class="text-decoration-none text-primary">プロジェクトA</a></td>
+          <td>新しいウェブアプリの開発</td>
+          <td>2024/01/10</td>
+          <td>2024/06/30</td>
+          <td>山田 太郎</td>
+          <td><span class="status-icon status-progress">進行中</span></td>
+        </tr>
+        <tr data-status="下書">
+          <td><a href="#" class="text-decoration-none text-primary">プロジェクトB</a></td>
+          <td>マーケティングキャンペーン</td>
+          <td>2023/09/01</td>
+          <td>2023/12/15</td>
+          <td>鈴木 花子</td>
+          <td><span class="status-icon status-draft">下書</span></td>
+        </tr>
+        <tr data-status="完了">
+          <td><a href="#" class="text-decoration-none text-primary">プロジェクトC</a></td>
+          <td>新しいECサイトの立ち上げ</td>
+          <td>2023/05/20</td>
+          <td>2023/11/30</td>
+          <td>佐藤 健</td>
+          <td><span class="status-icon status-complete">完了</span></td>
+        </tr>
+				{% for project in projects %}
+					<tr>
+						<td>{{ project.name }}</td>
+						<td>{{ project.description }}</td>
+						<td>{{ project.customer.name }}</td>
+						<td>{{ project.start_date }}</td>
+						<td>{{ project.end_date }}</td>
+						<td>{{ project.get_status_display }}</td>
+					</tr>
+				{% endfor %}
+      </tbody>
+    </table>
+  </div>
+	<!-- ページネーション -->
+<div id="pagination" class="pagination-container"></div>
+</div>
+
+<script>
+
+// ページング用の変数
+let currentPage = 1;
+let rowsPerPage = 5;
+
+// テーブルの表示を更新する関数
+function updateTableDisplay() {
+  rowsPerPage = parseInt(document.getElementById('rowsPerPage').value);
+  displayTablePage(currentPage);
+  updatePagination();
+}
+
+// テーブルのページを表示する関数
+function displayTablePage(page) {
+  const table = document.getElementById('projectTable');
+  const tr = table.getElementsByTagName('tr');
+  const start = (page - 1) * rowsPerPage + 1;
+  const end = start + rowsPerPage - 1;
+
+  for (let i = 1; i < tr.length; i++) {
+    tr[i].style.display = (i >= start && i <= end) ? '' : 'none';
+  }
+}
+
+// ページネーションを更新する関数
+function updatePagination() {
+  const table = document.getElementById('projectTable');
+  const tr = table.getElementsByTagName('tr');
+  const totalRows = tr.length - 1; // ヘッダー行を除く
+  const totalPages = Math.ceil(totalRows / rowsPerPage);
+  const pagination = document.getElementById('pagination');
+  
+  pagination.innerHTML = '';
+  
+  for (let i = 1; i <= totalPages; i++) {
+    const pageItem = document.createElement('button');
+    pageItem.textContent = i;
+    pageItem.classList.add('page-item', 'btn', 'btn-secondary', 'me-1', 'mb-1');
+    pageItem.onclick = () => {
+      currentPage = i;
+      displayTablePage(currentPage);
+      updatePagination();
+    };
+    
+    if (i === currentPage) {
+      pageItem.classList.add('active');
+    }
+    
+    pagination.appendChild(pageItem);
+  }
+}
+
+// ページロード時に表示とページネーションを初期化
+document.addEventListener('DOMContentLoaded', () => {
+  updateTableDisplay();
+  updatePagination();
+});
+	
+  // ソート機能を追加
+  function sortTable(n) {
+    let table = document.getElementById("projectTable");
+    let rows = table.rows;
+    let switching = true;
+    let dir = "asc";
+    let switchCount = 0;
+
+    while (switching) {
+      switching = false;
+      let shouldSwitch = false;
+
+      for (var i = 1; i < (rows.length - 1); i++) {
+        let x = rows[i].getElementsByTagName("TD")[n];
+        let y = rows[i + 1].getElementsByTagName("TD")[n];
+
+        if (dir == "asc") {
+          if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+            shouldSwitch = true;
+            break;
+          }
+        } else if (dir == "desc") {
+          if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+            shouldSwitch = true;
+            break;
+          }
+        }
+      }
+
+      if (shouldSwitch) {
+        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+        switching = true;
+        switchCount++;
+      } else {
+        if (switchCount == 0 && dir == "asc") {
+          dir = "desc";
+          switching = true;
+        }
+      }
+    }
+  }
+
+// テーブル検索機能
+function searchTable() {
+  const input = document.getElementById('searchInput');
+  const filter = input.value.toLowerCase();
+  const table = document.getElementById('projectTable');
+  const tr = table.getElementsByTagName('tr');
+
+  for (let i = 1; i < tr.length; i++) {
+    const tdArray = tr[i].getElementsByTagName('td');
+    let display = false;
+
+    for (let j = 0; j < tdArray.length; j++) {
+      if (tdArray[j]) {
+        const txtValue = tdArray[j].textContent || tdArray[j].innerText;
+        if (txtValue.toLowerCase().indexOf(filter) > -1) {
+          display = true;
+        }
+      }
+    }
+    tr[i].style.display = display ? '' : 'none';
+  }
+}
+
+  // ステータスごとの件数をカウント
+  function updateStatusCounts() {
+    const rows = document.querySelectorAll("tr[data-status]");
+    let progressCount = 0;
+    let draftCount = 0;
+    let completeCount = 0;
+
+    rows.forEach(row => {
+      const status = row.getAttribute('data-status');
+      if (status === '進行中') progressCount++;
+      if (status === '下書') draftCount++;
+      if (status === '完了') completeCount++;
+    });
+
+    document.getElementById("progressCount").textContent = progressCount;
+    document.getElementById("draftCount").textContent = draftCount;
+    document.getElementById("completeCount").textContent = completeCount;
+  }
+
+  // ページ読み込み時にステータス件数を更新
+  window.onload = updateStatusCounts;
+</script>
+{% endblock %}

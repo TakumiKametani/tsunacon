@@ -1,9 +1,12 @@
 {% load static %}
+{% load django_bootstrap5 %}
 {% block head %}
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" type="text/css" href="{% static 'css/style.min.css' %}" />
+    {% bootstrap_css %}
+    {% bootstrap_javascript %}
+<!--	<link rel="stylesheet" type="text/css" href="{% static 'css/style.min.css' %}" />-->
 	<link rel="stylesheet" type="text/css" href="{% static 'css/login/login.css' %}" />
 	<script src="{% static 'alpinejs/dist/cdn.min.js' %}" defer></script>
 </head>
