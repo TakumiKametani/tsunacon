@@ -7,14 +7,16 @@ from .models import Project, ChatMessage
 from .forms import ProjectForm, ChatMessageForm
 from django.http import JsonResponse
 
-class ProjectListView(View, LoginRequiredMixin):
+# class ProjectListView(View, LoginRequiredMixin):
+class ProjectListView(View):
     template_name = 'dashboard/project_list.html'
 
     def get(self, request):
         projects = Project.objects.all()
         return render(request, self.template_name, {'projects': projects})
 
-class ProjectDetailView(DetailView, LoginRequiredMixin):
+# class ProjectDetailView(DetailView, LoginRequiredMixin):
+class ProjectDetailView(DetailView):
     model = Project
     template_name = 'dashboard/project_detail.html'
 

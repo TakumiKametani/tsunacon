@@ -5,6 +5,7 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from encrypted_model_fields.fields import EncryptedCharField
 from utils.abs_model import TimeStampedModel
 from utils.validators import validate_katakana
+from utils.helper import get_upload_to
 
 CUSTOMER_TYPES = [
     ('company', '企業'),
@@ -21,13 +22,14 @@ class CustomUser(AbstractUser):
     user_permissions = models.ManyToManyField(Permission, related_name='customuser_set', blank=True)
 
 
-class Contract(TimeStampedModel):
-    ym = datetime.now()
-    contract_file = models.FileField(upload_to=f'contracts/{ym.year}/{ym.month}/')
+from django.db import models
+
+class Contract(models.Model):
     name = models.CharField(max_length=255)
+    contract_file = models.FileField(upload_to=get_upload_to)
 
     def __str__(self):
-        return f"{self.name}: {self.ym.year}/{self.ym.month}"
+        return f"{self.name}: {self.contract_file.url}"
 
 class UserBaseModel(models.Model):
     last_name = models.CharField(max_length=255)
@@ -83,3 +85,16 @@ class BankAccount(TimeStampedModel):
     def __str__(self):
         return f"{self.bank_name} - {self.account_number}"
 
+
+class Discount(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='discounts')
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # 数値指定の値引き
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # 割合での値引き
+
+    def apply_discount(self, original_price):
+        if self.discount_amount:
+            return max(original_price - self.discount_amount, 0)
+        elif self.discount_percentage:
+            return max(original_price * (1 - self.discount_percentage / 100), 0)
+        else:
+            return original_price

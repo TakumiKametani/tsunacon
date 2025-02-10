@@ -16,3 +16,5 @@ class TimeStampedModel(TimeStampedOrderingMixin):
 
     class Meta:
         abstract = True
+
+

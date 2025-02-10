@@ -2,6 +2,7 @@ from django.db import models
 from account.models import Customer
 
 class MaterialRequest(models.Model):
+    """資料請求で入力していただいた値は、真実かどうかが不明なので、こちらでも情報を保持しておく"""
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True, blank=True)
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
