@@ -21,6 +21,9 @@ from .forms import CustomerRegistrationForm, MemberRegistrationForm, ContractUpl
 
 from utils.zengin_code_utils import get_branch_list
 
+from axes.helpers import get_lockout_message
+from axes.models import AccessAttempt
+
 
 class TopView(TemplateView):
     template_name = "account/top.html"

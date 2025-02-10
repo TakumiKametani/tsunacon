@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth.models import User
 from account.models import Customer, Member, UserType
 from utils.abs_model import TimeStampedModel
 
@@ -51,13 +50,13 @@ class Project(TimeStampedModel):
 
 class Entry(TimeStampedModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Customer, on_delete=models.CASCADE)
     canceled = models.BooleanField(default=False)
 
 
 class ChatMessage(TimeStampedModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(Customer, on_delete=models.CASCADE)
     message = models.TextField()
     is_draft = models.BooleanField(default=False)
 

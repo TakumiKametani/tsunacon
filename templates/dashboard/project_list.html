@@ -1,38 +1,50 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project List</title>
-    <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
-</head>
-<body>
-    <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold">Project List</h1>
-        <table class="min-w-full bg-white">
-            <thead>
-                <tr>
-                    <th class="py-2">Name</th>
-                    <th class="py-2">Description</th>
-                    <th class="py-2">Customer</th>
-                    <th class="py-2">Start Date</th>
-                    <th class="py-2">End Date</th>
-                    <th class="py-2">Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for project in projects %}
-                <tr>
-                    <td class="py-2">{{ project.name }}</td>
-                    <td class="py-2">{{ project.description }}</td>
-                    <td class="py-2">{{ project.customer.name }}</td>
-                    <td class="py-2">{{ project.start_date }}</td>
-                    <td class="py-2">{{ project.end_date }}</td>
-                    <td class="py-2">{{ project.get_status_display }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</body>
-</html>
+{% extends 'base.html' %}
+{% block content %}
+<div class="bg-blue-500 text-white p-4">
+  TailwindCSS が適用されています！
+</div>
+
+<h1 class="text-2xl font-bold">案件一覧</h1>
+<div class="shadow-lg rounded-lg overflow-hidden mx-4 md:mx-10">
+    <table class="w-full table-fixed">
+        <thead>
+            <tr class="bg-gray-100">
+                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">案件名</th>
+                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">案件概要</th>
+                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">ご担当者様</th>
+                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">開始日</th>
+                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">終了日</th>
+                <th class="w-1/4 py-4 px-6 text-left text-gray-600 font-bold uppercase">ステータス</th>
+            </tr>
+        </thead>
+				<tbody>
+            <tr>
+                <td class="py-4 px-6 border-b border-gray-200">サンプル案件</td>
+                <td class="py-4 px-6 border-b border-gray-200 truncate">サンプルのため、HTMLにべた書きしている。データができたら削除をしていく。</td>
+                <td class="py-4 px-6 border-b border-gray-200">鈴木　一郎　様</td>
+                <td class="py-4 px-6 border-b border-gray-200">2025/2/10</td>
+                <td class="py-4 px-6 border-b border-gray-200">2025/2/20</td>
+                <td class="py-4 px-6 border-b border-gray-200">
+                    <span class="bg-red-500 text-white py-1 px-2 rounded-full text-xs">遂行中</span>
+                    <span class="bg-gray-500 text-white py-1 px-2 rounded-full text-xs">下書き</span>
+                    <span class="bg-yellow-500 text-white py-1 px-2 rounded-full text-xs">未遂行</span>
+                    <span class="bg-amber-500 text-white py-1 px-2 rounded-full text-xs">レビュー依頼</span>
+                    <span class="bg-purple-500 text-white py-1 px-2 rounded-full text-xs">完了</span>
+                </td>
+            </tr>
+						{% for project in projects %}
+						<tr>
+								<td class="py-2">{{ project.name }}</td>
+								<td class="py-2">{{ project.description }}</td>
+								<td class="py-2">{{ project.customer.name }}</td>
+								<td class="py-2">{{ project.start_date }}</td>
+								<td class="py-2">{{ project.end_date }}</td>
+								<td class="py-2">{{ project.get_status_display }}</td>
+						</tr>
+						{% endfor %}
+				</tbody>
+    </table>
+</div>
+
+{% endblock %}
+

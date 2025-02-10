@@ -142,16 +142,19 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTHENTICATION_BACKENDS = [
     'axes.backends.AxesStandaloneBackend',
     'django.contrib.auth.backends.ModelBackend',
+    'utils.middleware.EmailBackend'
 ]
 
+AUTH_USER_MODEL = 'account.CustomUser'
+
 # ログイン試行回数の制限
-LOGIN_ATTEMPTS_LIMIT = 3
-LOGIN_ATTEMPTS_TIMEOUT = 60*5
+LOGIN_ATTEMPTS_LIMIT = 5
+LOGIN_ATTEMPTS_TIMEOUT = 10
 # axesの設定
 # ロックされるまでのログイン回数
 AXES_FAILURE_LIMIT = 6
 # 自動でロックが解除されるまでの時間
-AXES_COOLOFF_TIME = 0.5
+AXES_COOLOFF_TIME = 5
 # ロック対象をusernameで判断する
 AXES_LOCKOUT_PARAMETERS = ["username"]
 # ログインに成功したら失敗回数をリセットされるようにする
@@ -160,6 +163,8 @@ AXES_RESET_ON_SUCCESS = True
 AXES_DISABLE_ACCESS_LOG = True
 # ロックアウト中にログインに失敗した場合、クールオフ期間をリセットしないようにする
 AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
+
+AXES_LOCKOUT_TEMPLATE = 'account/lockout.html'
 
 # セッションタイムアウトの設定
 SESSION_COOKIE_AGE = 60 * 60 * 24 * 7  # 1週間

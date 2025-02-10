@@ -6,13 +6,65 @@ from django import forms
 from .models import Customer, BankAccount, Member, Contract, UserType
 from utils.zengin_code_utils import get_bank_list, get_branch_list
 from utils.validators import validate_katakana
+from django.contrib.auth import authenticate
+
+
+
+class EmailAuthenticationForm(AuthenticationForm):
+    email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'autofocus': True}))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].widget.attrs['placeholder'] = 'your@email.com'
+        self.fields['password'].widget.attrs['placeholder'] = 'Enter your password'
+
+    def clean(self):
+        email = self.cleaned_data.get('email')
+        password = self.cleaned_data.get('password')
+
+        if email and password:
+            self.user_cache = authenticate(self.request, username=email, password=password)
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
+
 
 class LoginForm(AuthenticationForm):
+    email = forms.EmailField(label='Email', widget=forms.EmailInput(attrs={'autofocus': True}))
     """ログインフォーム"""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        for field in self.fields.values():
-            field.widget.attrs["class"] = "form-control"
+        # 'username' フィールドを削除
+        self.fields.pop('username')
+        # フィールドの順序を再設定
+        self.fields['email'] = self.fields.pop('email')
+        self.fields['password'] = self.fields.pop('password')
+        for field_name, field in self.fields.items():
+            field.widget.attrs["class"] = "shadow-sm rounded-md w-full px-3 py-2 border border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            field.widget.attrs["placeholder"] = self.add_placeholder(field_name)
+
+    def add_placeholder(self, field_name):
+        placeholders = {
+            'email': 'your@email.com',
+            'password': 'Enter your password',
+        }
+        return placeholders.get(field_name, '')
+
+    def clean(self):
+        email = self.cleaned_data.get('email')
+        password = self.cleaned_data.get('password')
+
+        if email and password:
+            self.user_cache = authenticate(self.request, username=email, password=password)
+            if self.user_cache is None:
+                raise self.get_invalid_login_error()
+            else:
+                self.confirm_login_allowed(self.user_cache)
+
+        return self.cleaned_data
 
 
 class CustomPasswordChangeForm(PasswordChangeForm):
@@ -53,9 +105,6 @@ class CustomerPreRegistrationForm(forms.ModelForm):
             'address_1',
             'address_2'
         ]
-        # widgets = {
-        #     'customer_type': forms.RadioSelect
-        # }
 
     def save(self, commit=True):
         instance = super().save(commit=False)

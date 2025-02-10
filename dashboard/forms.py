@@ -6,9 +6,8 @@ class ProjectForm(forms.ModelForm):
     class Meta:
         model = Project
         fields = [
-            'name', 'description', 'grade', 'estimated_hours', 'customer',
-            'client_name', 'start_date', 'end_date', 'amount', 'status',
-            'entry_not_allowed', 'tuna_con', 'tuna_spa'
+            'name', 'description', 'grade', 'estimated_hours',
+            'start_date', 'end_date'
         ]
         widgets = {
             'estimated_hours': forms.NumberInput(attrs={'placeholder': '見込時間（時間単位）'}),
@@ -19,19 +18,12 @@ class ProjectForm(forms.ModelForm):
             'estimated_hours': '見込時間（時間単位）',
         }
         labels = {
-            'name': 'プロジェクト名',
+            'name': '案件名',
             'description': '説明',
-            'grade': 'グレード',
+            'grade': '実施内容',
             'estimated_hours': '見込時間',
-            'customer': '顧客',
-            'client_name': 'クライアント名',
             'start_date': '開始日',
             'end_date': '終了日',
-            'amount': '金額',
-            'status': 'ステータス',
-            'entry_not_allowed': 'エントリ不許可',
-            'tuna_con': 'ツナコン担当',
-            'tuna_spa': 'ツナスパ担当',
         }
 
 class ChatMessageForm(forms.ModelForm):

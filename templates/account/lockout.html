@@ -1,0 +1,10 @@
+{% extends 'login_base.html' %}
+{% block content %}
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg px-8 py-6 max-w-md text-center">
+            <h1 class="text-2xl font-bold text-center mb-4 text-gray-900 dark:text-gray-100">アカウントがロックされています</h1>
+            <p class="text-gray-700 dark:text-gray-300 mb-4">ログイン試行回数が多すぎたため、アカウントが一時的にロックされています。しばらくしてから再試行してください。</p>
+            <a href="{% url 'account:login_choice' %}" class="text-indigo-500 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">ログイン選択画面に戻る</a>
+        </div>
+    </div>
+{% endblock %}
