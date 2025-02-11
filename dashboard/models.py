@@ -8,18 +8,18 @@ PROJECT_CANCELED = "project_canceled"
 PROJECT_ACCEPTED = "project_accepted"
 IN_PROGRESS = "in_progress"
 COMPLETION = "completion"
-RETURNED = "returned"
+REVIEW = "review"
 PROJECT_COMPLETED = "project_completed"
 
 
 STATUS = [
-    (DRAFT, '下書き'),
+    (DRAFT, '下書'),
     (REGISTRATION_COMPLETE, '登録完了'),
-    (PROJECT_CANCELED, '案件キャンセル'),
-    (PROJECT_ACCEPTED, '案件請負'),
+    (PROJECT_CANCELED, 'キャンセル'),
+    (PROJECT_ACCEPTED, '請負済'),
     (IN_PROGRESS, '遂行中'),
     (COMPLETION, '遂行完了'),
-    (RETURNED, '差戻'),
+    (REVIEW, 'レビュー'),
     (PROJECT_COMPLETED, '案件完了'),
 ]
 
@@ -41,8 +41,9 @@ class Project(TimeStampedModel):
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=50, choices=STATUS)
     entry_not_allowed = models.BooleanField(default=False)
-    tuna_con = models.ForeignKey(Member, related_name='tuna_con_member', on_delete=models.CASCADE)
-    tuna_spa = models.ForeignKey(Member, related_name='tuna_spa_member', on_delete=models.CASCADE)
+    tuna_con = models.ForeignKey(Member, related_name='tuna_con_member', blank=True, null=True, on_delete=models.CASCADE)
+    tuna_spa = models.ForeignKey(Member, related_name='tuna_spa_member', blank=True, null=True, on_delete=models.CASCADE)
+    tuna_spa_helper = models.ForeignKey(Member, related_name='tuna_spa_member_helper', blank=True, null=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name

@@ -85,26 +85,47 @@
   </div>
 
   <!-- ステータスごとの件数表示 -->
-  <div class="status-counts">
-    <div class="d-inline status-progress-count">
-      <span class="status-icon status-progress">進行中</span>
-      <span id="progressCount">0</span>件
-    </div>
-    <div class="d-inline status-draft-count">
-      <span class="status-icon status-draft">下書</span>
+  <div class="d-flex gap-2 justify-content-center py-5">
+    <div class="status-draft-count">
+      <span class="badge d-flex align-items-center p-1 pe-2 text-dark-emphasis bg-light-subtle border border-dark-subtle rounded-pill">下書</span>
       <span id="draftCount">0</span>件
     </div>
-    <div class="d-inline status-complete-count">
-      <span class="status-icon status-complete">完了</span>
+    <div class="status-registration-count">
+      <span class="badge d-flex align-items-center p-1 pe-2 text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-pill">登録完了</span>
+      <span id="registrationCount">0</span>件
+    </div>
+		<div class="status-cancel-count">
+      <span class="badge d-flex align-items-center p-1 pe-2 text-secondary-emphasis bg-secondary-subtle border border-secondary-subtle rounded-pill">キャンセル</span>
+      <span id="cancelCount">0</span>件
+    </div>
+    <div class="status-accepted-count">
+      <span class="badge d-flex align-items-center p-1 pe-2 text-info-emphasis bg-info-subtle border border-info-subtle rounded-pill">請負済</span>
+      <span id="acceptedCount">0</span>件
+    </div>
+		<div class="status-progress-count">
+      <span class="badge d-flex align-items-center p-1 pe-2 text-info-emphasis bg-info-subtle border border-info-subtle rounded-pill">進行中</span>
+      <span id="progressCount">0</span>件
+    </div>
+		<div class="status-complete-count">
+      <span class="badge d-flex align-items-center p-1 pe-2 text-success-emphasis bg-success-subtle border border-success-subtle rounded-pill">遂行完了</span>
       <span id="completeCount">0</span>件
     </div>
+		<div class="status-review-count">
+      <span class="badge d-flex align-items-center p-1 pe-2 text-warning-emphasis bg-warning-subtle border border-warning-subtle rounded-pill">レビュー</span>
+      <span id="reviewCount">0</span>件
+    </div>
+    <div class="status-project-complete-count">
+      <span class="badge d-flex align-items-center p-1 pe-2 text-dark-emphasis bg-dark-subtle border border-dark-subtle rounded-pill">完了</span>
+      <span id="ProjectCompleteCount">0</span>件
+    </div>
+		
   </div>
 
 <!-- 表示件数切り替えドロップダウン -->
 <div class="rows-per-page mb-3">
   <label for="rowsPerPage" class="form-label">表示件数:</label>
   <select id="rowsPerPage" class="form-select" onchange="updateTableDisplay()">
-    <option value="1">1件</option>
+    <option value="5">5件</option>
     <option value="10">10件</option>
     <option value="15">15件</option>
     <option value="20">20件</option>
@@ -130,7 +151,7 @@
           <td>2024/01/10</td>
           <td>2024/06/30</td>
           <td>山田 太郎</td>
-          <td><span class="status-icon status-progress">進行中</span></td>
+          <td><span class="badge d-flex align-items-center p-1 pe-2 text-info-emphasis bg-info-subtle border border-info-subtle rounded-pill">進行中</span></td>
         </tr>
         <tr data-status="下書">
           <td><a href="#" class="text-decoration-none text-primary">プロジェクトB</a></td>
@@ -138,7 +159,7 @@
           <td>2023/09/01</td>
           <td>2023/12/15</td>
           <td>鈴木 花子</td>
-          <td><span class="status-icon status-draft">下書</span></td>
+          <td><span class="badge d-flex align-items-center p-1 pe-2 text-dark-emphasis bg-light-subtle border border-dark-subtle rounded-pill">下書</span></td>
         </tr>
         <tr data-status="完了">
           <td><a href="#" class="text-decoration-none text-primary">プロジェクトC</a></td>
@@ -146,7 +167,7 @@
           <td>2023/05/20</td>
           <td>2023/11/30</td>
           <td>佐藤 健</td>
-          <td><span class="status-icon status-complete">完了</span></td>
+          <td><span class="badge d-flex align-items-center p-1 pe-2 text-success-emphasis bg-success-subtle border border-success-subtle rounded-pill">遂行完了</span></td>
         </tr>
 				{% for project in projects %}
 					<tr>
@@ -155,7 +176,24 @@
 						<td>{{ project.customer.name }}</td>
 						<td>{{ project.start_date }}</td>
 						<td>{{ project.end_date }}</td>
-						<td>{{ project.get_status_display }}</td>
+						<td>
+							{% if project.get_status_display == 'draft' %}
+							<span class="badge d-flex align-items-center p-1 pe-2 text-dark-emphasis bg-light-subtle border border-dark-subtle rounded-pill">下書
+							{% elif project.get_status_display == 'registration_complete' %}
+							<span class="badge d-flex align-items-center p-1 pe-2 text-primary-emphasis bg-primary-subtle border border-primary-subtle rounded-pill">登録完了
+							{% elif project.get_status_display == 'project_canceled' %}
+							<span class="badge d-flex align-items-center p-1 pe-2 text-secondary-emphasis bg-secondary-subtle border border-secondary-subtle rounded-pill">キャンセル
+							{% elif project.get_status_display in 'project_accepted,in_progress' %}
+							<span class="badge d-flex align-items-center p-1 pe-2 text-info-emphasis bg-info-subtle border border-info-subtle rounded-pill">{% if project.get_status_display == 'project_accepted' %}請負済{% else %}遂行中{% endif %}
+							{% elif project.get_status_display == 'completion' %}
+							<span class="badge d-flex align-items-center p-1 pe-2 text-success-emphasis bg-success-subtle border border-success-subtle rounded-pill">遂行完了
+							{% elif project.get_status_display == 'review' %}
+							<span class="badge d-flex align-items-center p-1 pe-2 text-warning-emphasis bg-warning-subtle border border-warning-subtle rounded-pill">レビュー
+							{% elif project.get_status_display == 'project_completed' %}
+							<span class="badge d-flex align-items-center p-1 pe-2 text-dark-emphasis bg-dark-subtle border border-dark-subtle rounded-pill">完了
+							{% endif %}
+							</span>
+						</td>
 					</tr>
 				{% endfor %}
       </tbody>
@@ -289,26 +327,43 @@ function searchTable() {
   }
 }
 
-  // ステータスごとの件数をカウント
-  function updateStatusCounts() {
-    const rows = document.querySelectorAll("tr[data-status]");
-    let progressCount = 0;
-    let draftCount = 0;
-    let completeCount = 0;
+// ステータスごとの件数をカウント
+function updateStatusCounts() {
+  const rows = document.querySelectorAll("tr[data-status]");
+  
+  let progressCount = 0;
+  let acceptedCount = 0;
+  let draftCount = 0;
+  let completeCount = 0;
+  let registrationCount = 0;
+  let cancelCount = 0;
+  let reviewCount = 0;
+  let projectCompleteCount = 0;
 
-    rows.forEach(row => {
-      const status = row.getAttribute('data-status');
-      if (status === '進行中') progressCount++;
-      if (status === '下書') draftCount++;
-      if (status === '完了') completeCount++;
-    });
+  rows.forEach(row => {
+    const status = row.getAttribute('data-status');
+    if (status === '進行中') progressCount++;
+    if (status === '請負済') acceptedCount++;
+    if (status === '下書') draftCount++;
+    if (status === '完了') completeCount++;
+    if (status === '登録完了') registrationCount++;
+    if (status === 'キャンセル') cancelCount++;
+    if (status === 'レビュー') reviewCount++;
+    if (status === '遂行完了') projectCompleteCount++;
+  });
 
-    document.getElementById("progressCount").textContent = progressCount;
-    document.getElementById("draftCount").textContent = draftCount;
-    document.getElementById("completeCount").textContent = completeCount;
-  }
+  document.getElementById("progressCount").textContent = progressCount;
+  document.getElementById("acceptedCount").textContent = acceptedCount;
+  document.getElementById("draftCount").textContent = draftCount;
+  document.getElementById("completeCount").textContent = completeCount;
+  document.getElementById("registrationCount").textContent = registrationCount;
+  document.getElementById("cancelCount").textContent = cancelCount;
+  document.getElementById("reviewCount").textContent = reviewCount;
+  document.getElementById("ProjectCompleteCount").textContent = projectCompleteCount;
+}
 
-  // ページ読み込み時にステータス件数を更新
-  window.onload = updateStatusCounts;
+// ページ読み込み時にステータス件数を更新
+window.onload = updateStatusCounts;
+
 </script>
 {% endblock %}

@@ -48,23 +48,13 @@ class UserBaseModel(models.Model):
         abstract = True
 
 
-class Customer(UserBaseModel, TimeStampedModel):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='customer_profiles')
-    name = models.CharField(max_length=255, null=True, blank=True, verbose_name='組織・企業・団体名')
-    customer_type = models.CharField(max_length=50, choices=CUSTOMER_TYPES)
-    billing_email = models.EmailField(null=True, blank=True)
-    payment_due_day = models.IntegerField(null=True, blank=True)
-
-    def __str__(self):
-        return f"{self.customer_type} - {self.name}"
-
-
 class UserType(TimeStampedModel):
     type_id = models.PositiveSmallIntegerField(unique=True)
     name = models.CharField(max_length=50)
 
     def __str__(self):
         return self.name
+
 
 class Member(UserBaseModel, TimeStampedModel):
     user_types = models.ManyToManyField(UserType, related_name='members')
@@ -73,6 +63,19 @@ class Member(UserBaseModel, TimeStampedModel):
 
     def __str__(self):
         return f"{self.user_types} - {self.last_name} {self.first_name}({self.last_name_kana} {self.first_name_kana}) - {self.referral_id}"
+
+
+class Customer(UserBaseModel, TimeStampedModel):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='customer_profiles')
+    name = models.CharField(max_length=255, null=True, blank=True, verbose_name='組織・企業・団体名')
+    customer_type = models.CharField(max_length=50, choices=CUSTOMER_TYPES)
+    billing_email = models.EmailField(null=True, blank=True)
+    payment_due_day = models.IntegerField(null=True, blank=True)
+    referral_member = models.ForeignKey(Member, related_name='referral_member', blank=True, null=True, on_delete=models.CASCADE)
+    service_started = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.customer_type} - {self.name}"
 
 
 class BankAccount(TimeStampedModel):
