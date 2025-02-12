@@ -90,6 +90,8 @@ class CustomerPreRegistrationForm(forms.ModelForm):
     email = forms.EmailField(label='User Email', required=True)
     last_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     first_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
+    terms_accepted = forms.BooleanField(label='利用規約を読了しました', required=True)
+    privacy_policy_accepted = forms.BooleanField(label='プライバシーポリシーを読了しました', required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -109,21 +111,34 @@ class CustomerPreRegistrationForm(forms.ModelForm):
             'phone',
             'postal_code',
             'address_1',
-            'address_2'
+            'address_2',
+            'terms_accepted',
+            'privacy_policy_accepted'
         ]
 
     def save(self, commit=True):
         instance = super().save(commit=False)
         if commit:
-            instance.user.email = self.cleaned_data['user_email']
+            instance.user.email = self.cleaned_data['email']
+            instance.terms_accepted = self.cleaned_data['terms_accepted']
+            instance.privacy_policy_accepted = self.cleaned_data['privacy_policy_accepted']
             instance.user.save()
             instance.save()
         return instance
 
+
 class MemberPreRegistrationForm(forms.ModelForm):
+    USER_TYPE_CHOICES = [
+        ('tsunacon', 'つなコン'),
+        ('tsunasp', 'つなスパ'),
+        ('tsunamen', 'つなメン'),
+    ]
+    user_type = forms.ChoiceField(label='登録タイプ', required=True, choices=USER_TYPE_CHOICES, widget=forms.widgets.Select)
     email = forms.EmailField(label='User Email', required=True)
     last_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     first_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
+    terms_accepted = forms.BooleanField(label='利用規約を読了しました', required=True)
+    privacy_policy_accepted = forms.BooleanField(label='プライバシーポリシーを読了しました', required=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -134,6 +149,7 @@ class MemberPreRegistrationForm(forms.ModelForm):
     class Meta:
         model = Member
         fields = [
+            'user_type',
             'last_name',
             'first_name',
             'last_name_kana',
@@ -142,16 +158,21 @@ class MemberPreRegistrationForm(forms.ModelForm):
             'phone',
             'postal_code',
             'address_1',
-            'address_2'
+            'address_2',
+            'terms_accepted',
+            'privacy_policy_accepted'
         ]
 
     def save(self, commit=True):
         instance = super().save(commit=False)
         if commit:
-            instance.user.email = self.cleaned_data['user_email']
+            instance.user.email = self.cleaned_data['email']
+            instance.terms_accepted = self.cleaned_data['terms_accepted']
+            instance.privacy_policy_accepted = self.cleaned_data['privacy_policy_accepted']
             instance.user.save()
             instance.save()
         return instance
+
 
 
 class CustomerRegistrationForm(forms.ModelForm):

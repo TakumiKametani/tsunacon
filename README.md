@@ -67,7 +67,12 @@ tsunacon\secure.yml
 
 ### 11. テーブル作成
 
-```sh
+```
+まだmigrationファイルがないから、makemigrationの実施もする。
+そのうちにmigrationファイル自体をコミットしていく。
+その時には、コンフリクトを起こしてしまうので、sqliteDBの削除など、手順を記載していく
+ひとまず下記のコマンドを実施のこと
+python manage.py makemigrations
 python manage.py migrations
 ```
 

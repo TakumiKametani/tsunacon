@@ -1,27 +1,113 @@
 {% extends 'login_base.html' %}
-{% block title %}Member Registration{% endblock %}
+{% block title %}Customer Registration{% endblock %}
 {% block content %}
-    <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold">Member Registration</h1>
+	<!-- lg:max-w-xl  min-h-screen flex items-center justify-center w-full dark:bg-gray-950-->
+    <div class="w-full px-8 py-10 mx-auto overflow-hidden bg-white rounded-lg shadow-2xl dark:bg-gray-900 shadow-gray-300/50 dark:shadow-black/50" style="padding-top: 120px; width:50%;" x-data="katakanaInputValidation()">
+        <h1 class="text-lg font-medium text-gray-700">Customer Registration</h1>
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Register</button>
+            {{ form.non_field_errors }}
+						<label for="user_type" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">登録希望タイプ</label>
+						<select name="user_type" id="user_type" class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40">
+								{% for value, label in form.user_type.field.choices %}
+										<option value="{{ value }}" {% if value == form.user_type.value %}selected{% endif %}>{{ label }}</option>
+								{% endfor %}
+						</select>
+            <div class="flex space-x-4">
+							<div class="flex-1">
+                <label for="last_name" class="block text-gray-700 mt-2">姓</label>
+                {{ form.last_name }}
+            	</div>
+            	<div class="flex-1">
+              	  <label for="first_name" class="block text-gray-700 mt-2">名</label>
+                	{{ form.first_name }}
+            	</div>
+						</div>
+            <div class="flex space-x-4">
+                <div class="flex-1">
+                    <label for="last_name_kana" class="block text-gray-700 mt-2">姓(カナ)</label>
+                    <input type="text" id="last_name_kana" name="last_name_kana" x-model="lastNameKana" @input="validateKatakana" class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring focus:ring-blue-400 focus:outline-none focus:ring-opacity-40">
+                    <p x-show="!isLastNameKanaValid" class="text-red-500">このフィールドはカタカナのみを含む必要があります。</p>
+                </div>
+                <div class="flex-1">
+                    <label for="first_name_kana" class="block text-gray-700 mt-2">名(カナ)</label>
+                    <input type="text" id="first_name_kana" name="first_name_kana" x-model="firstNameKana" @input="validateKatakana" class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring focus:ring-blue-400 focus:outline-none focus:ring-opacity-40">
+                    <p x-show="!isFirstNameKanaValid" class="text-red-500">このフィールドはカタカナのみを含む必要があります。</p>
+                </div>
+            </div>
+            <div>
+                <label for="email" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">メールアドレス</label>
+                {{ form.email }}
+            </div>
+            <div>
+                <label for="phone" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">電話番号</label>
+                {{ form.phone }}
+            </div>
+            <div>
+                <label for="postal_code" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">郵便番号</label>
+                {{ form.postal_code }}
+            </div>
+            <div>
+							<label for="address_1" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">住所</label>
+							{{ form.address_1 }}
+            </div>
+            <div>
+							<label for="address_2" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">ビル・建物名〇階</label>
+							{{ form.address_2 }}
+            </div>
+            <div>
+							<label for="terms_accepted" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">利用規約を読了しました</label>
+							{{ form.terms_accepted }}
+            </div>
+            <div>
+							<label for="privacy_policy_accepted" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">プライバシーポリシーを読了しました</label>
+							{{ form.privacy_policy_accepted }}
+            </div>
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-4" :disabled="!isFormValid">Register</button>
         </form>
-        <button @click="modalOpen = true" class="bg-gray-500 text-white px-4 py-2 rounded mt-4">Show Details</button>
-        <div x-show="modalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center" @click.away="modalOpen = false">
-            <div class="bg-white p-4 rounded">
+        <div class="mt-6" x-data="{ open: false }">
+          <button class="bg-gray-500 text-white px-4 py-2 rounded mt-4" @click="open = true">modal</button>
+      
+          <div class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center" x-show="open">
+            <div class="bg-white p-4 rounded" @click.away="open = false">
                 <h2 class="text-xl font-bold">Registration Details</h2>
                 <p>Here you can provide additional details about the registration process.</p>
-                <button @click="modalOpen = false" class="bg-red-500 text-white px-4 py-2 rounded mt-4">Close</button>
+								<div class="flex justify-center mt-8">
+                <button class="bg-red-500 text-white px-4 py-2 rounded mt-4" @click="open = false">Close</button>
+              </div>
             </div>
+          </div>
         </div>
     </div>
+
     <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('modal', () => ({
-                modalOpen: false,
-            }));
-        });
+        function katakanaInputValidation() {
+            return {
+                firstNameKana: '',
+                lastNameKana: '',
+                isFirstNameKanaValid: true,
+                isLastNameKanaValid: true,
+                get isFormValid() {
+                    return this.isFirstNameKanaValid && this.isLastNameKanaValid;
+                },
+                validateKatakana(event) {
+                    const katakanaRegex = /^[\u30A0-\u30FF]+$/;
+                    const fieldName = event.target.id;
+                    if (fieldName === 'first_name_kana') {
+                    	if( this.firstNameKana.length < 1){
+                    		this.isFirstNameKanaValid = true;
+                    	}else{
+                        this.isFirstNameKanaValid = katakanaRegex.test(this.firstNameKana);
+											}
+                    } else if (fieldName === 'last_name_kana') {
+											if( this.lastNameKana.length < 1){
+													this.isLastNameKanaValid = true;
+											}else{
+                        this.isLastNameKanaValid = katakanaRegex.test(this.lastNameKana);
+											}
+                    }
+                }
+            }
+        }
     </script>
 {% endblock %}

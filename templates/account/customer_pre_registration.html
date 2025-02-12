@@ -7,7 +7,7 @@
         <form method="post">
             {% csrf_token %}
             {{ form.non_field_errors }}
-            <div>
+            <div>メモ：企業や、組織、団体の場合は、会社名を必須で入力にしたい。会社名入力欄も入れ込みたい。
                 <label for="customer_type" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">Customer Type:</label>
                 {{ form.customer_type }}
             </div>
@@ -34,24 +34,32 @@
                 </div>
             </div>
             <div>
-                <label for="email" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">Email:</label>
+                <label for="email" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">メールアドレス</label>
                 {{ form.email }}
             </div>
             <div>
-                <label for="phone" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">Phone:</label>
+                <label for="phone" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">電話番号</label>
                 {{ form.phone }}
             </div>
             <div>
-                <label for="postal_code" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">Postal Code:</label>
+                <label for="postal_code" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">郵便番号</label>
                 {{ form.postal_code }}
             </div>
             <div>
-                <label for="address_1" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">Address 1:</label>
+                <label for="address_1" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">住所</label>
                 {{ form.address_1 }}
             </div>
             <div>
-                <label for="address_2" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">Address 2:</label>
+                <label for="address_2" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">ビル・建物名〇階</label>
                 {{ form.address_2 }}
+            </div>
+						<div>
+							<label for="terms_accepted" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">利用規約を読了しました</label>
+							{{ form.terms_accepted }}
+            </div>
+            <div>
+							<label for="privacy_policy_accepted" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">プライバシーポリシーを読了しました</label>
+							{{ form.privacy_policy_accepted }}
             </div>
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-4" :disabled="!isFormValid">Register</button>
         </form>
