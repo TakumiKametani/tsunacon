@@ -5,7 +5,6 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from encrypted_model_fields.fields import EncryptedCharField
 from utils.abs_model import TimeStampedModel
 from utils.validators import validate_katakana
-from utils.helper import get_upload_to
 
 CUSTOMER_TYPES = [
     ('company', '企業'),
@@ -14,6 +13,27 @@ CUSTOMER_TYPES = [
     ('sole_proprietor', '個人事業主'),
     ('group', '団体'),
 ]
+
+GENDER_TYPE = [
+    ('n', '未回答'),
+    ('m', '男性'),
+    ('w', '女性'),
+    ('o', '他')
+]
+
+
+def get_upload_to_contract(instance, filename):
+    now = datetime.now()
+    if isinstance(instance, Customer):
+        identifier = f"{instance.last_name}_{instance.first_name}_customer"
+    else:
+        identifier = f"{instance.last_name}_{instance.first_name}_member"
+    return f'contracts/{now.year}/{now.month}/{identifier}/{filename}'
+
+
+def get_upload_to_resume(instance, filename):
+    return f'resumes/{instance.member.user.username}/{filename}'
+
 
 class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
@@ -25,7 +45,7 @@ class CustomUser(AbstractUser):
 
 class Contract(models.Model):
     name = models.CharField(max_length=255)
-    contract_file = models.FileField(upload_to=get_upload_to)
+    contract_file = models.FileField(upload_to=get_upload_to_contract)
 
     def __str__(self):
         return f"{self.name}: {self.contract_file.url}"
@@ -63,6 +83,14 @@ class Member(UserBaseModel, TimeStampedModel):
     def __str__(self):
         return f"{self.user_types} - {self.last_name} {self.first_name}({self.last_name_kana} {self.first_name_kana}) - {self.referral_id}"
 
+
+class MemberProfile(TimeStampedModel):
+    member = models.ForeignKey(Member, related_name='member', on_delete=models.CASCADE)
+    gender = models.CharField(max_length=2, choices=GENDER_TYPE)
+    age = models.PositiveSmallIntegerField(max_length=2, null=True, blank=True)
+    description = models.TextField(null=True, blank=True, help_text='簡易的な経歴等の記載', verbose_name='自己PR')
+    port_folio = models.URLField(null=True, blank=True)
+    resume = models.FileField(upload_to=get_upload_to_resume, null=True, blank=True)  # 動的パス
 
 class Customer(UserBaseModel, TimeStampedModel):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='customer_profiles')

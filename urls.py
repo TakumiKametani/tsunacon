@@ -22,4 +22,5 @@ urlpatterns = [
     path("", include("account.urls")),
     path("material_request/", include("material_request.urls", namespace='material_request')),
     path("dashboard/", include("dashboard.urls", namespace='dashboard')),
+    path("info/", include("info.urls", namespace='info')),
 ]

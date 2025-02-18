@@ -10,11 +10,11 @@
     {% block header_extra %}{% endblock %}
   </head>
   <body>
-    {% include "login_header.html" %}
+    {% include "header.html" %}
     <main class="d-flex align-items-center justify-content-center min-vh-100">
       {% block content %}{% endblock %}
     </main>
-    {% include "login_footer.html" %}
+    {% include "footer.html" %}
     {% bootstrap_javascript %}
   </body>
 </html>

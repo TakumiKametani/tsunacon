@@ -9,33 +9,51 @@
 
           <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
             <li>
-              <a href="#" class="nav-link text-secondary">
+              <a href="{% url 'info:question_answer' %}" class="nav-link {% if 'info/question_answer' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/info.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
-                Information
+                Q/A
+              </a>
+            </li>
+						<li>
+              <a href="{% url 'info:information' %}" class="nav-link {% if 'info/information' in request.path %}text-secondary{% else %}text-white{% endif %}">
+                <img src="{% static 'image/icon/info.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
+                お知らせ
+              </a>
+            </li>
+						<li>
+              <a href="{% url 'info:customer_voice' %}" class="nav-link {% if 'info/customer_voice' in request.path %}text-secondary{% else %}text-white{% endif %}">
+                <img src="{% static 'image/icon/info.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
+                お客様の声
               </a>
             </li>
             <li>
-              <a href="#" class="nav-link text-white">
+              <a href="{% url 'info:price' %}" class="nav-link {% if 'info/price' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/project.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
-                Projects
+                料金
               </a>
             </li>
             <li>
-              <a href="#" class="nav-link text-white">
+              <a href="{% url 'info:characteristic' %}" class="nav-link {% if 'info/characteristic' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/graph.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
-                Graph
+                つなコンとは
               </a>
             </li>
             <li>
-              <a href="#" class="nav-link text-white">
+              <a href="{% url 'info:contact' %}" class="nav-link {% if 'info/contact' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/notification.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
-                Notify
+                お問い合せ
               </a>
             </li>
             <li>
-              <a href="#" class="nav-link text-white">
+              <a href="{% url 'material_request:request' %}" class="nav-link {% if 'material_request' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/contact.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
-                Contact
+                資料請求
+              </a>
+            </li>
+						<li>
+              <a href="{% url 'account:login_choice' %}" class="nav-link {% if 'login' in request.path %}text-secondary{% else %}text-white{% endif %}">
+                <img src="{% static 'image/icon/contact.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
+                ログイン/会員登録
               </a>
             </li>
           </ul>

@@ -6,12 +6,10 @@ from . import views
 app_name="account"
 urlpatterns = [
     path("", views.TopView.as_view(), name="top"),
-    path("home/", views.HomeView.as_view(), name="home"),
     path("login_choice/", views.LoginChoiceView.as_view(), name="login_choice"),
     path("admin_login/", views.AdminLoginView.as_view(), name="admin_login"),
     path('customer_login/', views.CustomerLoginView.as_view(), name='customer_login'),
     path('member_login/', views.MemberLoginView.as_view(), name='member_login'),
-    path('sales_login/', views.SalesLoginView.as_view(), name='sales_login'),
     path("logout/", views.LogoutView.as_view(), name="logout"),
     # 仮登録
     path('customer_pre_registration/', views.CustomerPreRegistrationView.as_view(), name='customer_pre_registration'),

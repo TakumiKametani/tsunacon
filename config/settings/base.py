@@ -46,6 +46,7 @@ INSTALLED_APPS += [
     'account',
     'material_request',
     'dashboard',
+    'info',
 ]
 
 MIDDLEWARE = [

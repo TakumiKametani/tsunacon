@@ -28,8 +28,6 @@ from axes.models import AccessAttempt
 class TopView(TemplateView):
     template_name = "account/top.html"
 
-class HomeView(LoginRequiredMixin, TemplateView):
-    template_name = "account/home.html"
 
 class AdminLoginView(LoginView):
     """ログインページ"""
@@ -43,10 +41,6 @@ class CustomerLoginView(LoginView):
 
 class MemberLoginView(LoginView):
     template_name = 'account/member_login.html'
-
-
-class SalesLoginView(LoginView):
-    template_name = 'account/sales_login.html'
 
 
 class LoginChoiceView(TemplateView):

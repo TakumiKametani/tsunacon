@@ -9,31 +9,31 @@
 
           <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
             <li>
-              <a href="#" class="nav-link text-secondary">
+              <a href="#" class="nav-link {% if 'info' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/info.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
                 Information
               </a>
             </li>
             <li>
-              <a href="#" class="nav-link text-white">
+              <a href="#" class="nav-link {% if 'dashboard' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/project.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
                 Projects
               </a>
             </li>
             <li>
-              <a href="#" class="nav-link text-white">
+              <a href="#" class="nav-link {% if 'graph' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/graph.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
                 Graph
               </a>
             </li>
             <li>
-              <a href="#" class="nav-link text-white">
+              <a href="#" class="nav-link {% if 'notification' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/notification.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
                 Notify
               </a>
             </li>
             <li>
-              <a href="#" class="nav-link text-white">
+              <a href="#" class="nav-link {% if 'contact' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/contact.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
                 Contact
               </a>
