@@ -1,12 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payment Detail</title>
-    <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
-</head>
-<body>
+{% extends 'login_base.html' %}
+{% block title %}{% endblock %}
+
+{% block content %}
     <div class="container mx-auto p-4">
         <h1 class="text-2xl font-bold">Payment Detail for {{ year }}/{{ month }}</h1>
         
@@ -44,5 +39,4 @@
         
         <a href="{% url 'payment_list' %}" class="text-blue-500">Back to Payment List</a>
     </div>
-</body>
-</html>
+{% endblock %}

@@ -18,9 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path("", include("account.urls")),
-    path("material_request/", include("material_request.urls", namespace='material_request')),
+    path('admin/', admin.site.urls),
     path("dashboard/", include("dashboard.urls", namespace='dashboard')),
+    path("department/", include("department.urls", namespace='department')),
     path("info/", include("info.urls", namespace='info')),
+    path("invoice/", include("invoice.urls", namespace='invoice')),
+    path("material_request/", include("material_request.urls", namespace='material_request')),
+    path("payment/", include("payment.urls", namespace='payment')),
+    path("ticket/", include("ticket.urls", namespace='ticket')),
 ]

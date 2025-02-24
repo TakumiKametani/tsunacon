@@ -3,7 +3,7 @@ import string
 
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm
 from django import forms
-from .models import Customer, BankAccount, Member, Contract, UserType
+from .models import Customer, CustomerBankAccount, MemberBankAccount, Member, OutsourcingAgreement, ConfidentialityAgreement, ServiceUseAgreement, UserType
 from utils.zengin_code_utils import get_bank_list, get_branch_list
 from utils.validators import validate_katakana
 from django.contrib.auth import authenticate
@@ -210,23 +210,24 @@ class CustomerRegistrationForm(forms.ModelForm):
             'branch_name',
             'account_number',
             'account_holder',
-            'contract_file',
+            'service_use_contract_file',
         ]
 
     def save(self, commit=True):
-        member = super().save(commit=False)
+        customer = super().save(commit=False)
         if commit:
-            member.save()
-            BankAccount.objects.create(
-                user=member.user,
+            customer.save()
+            CustomerBankAccount.objects.create(
+                user=customer.user,
                 bank_name=self.cleaned_data['bank_name'],
                 branch_name=self.cleaned_data['branch_name'],
                 account_number=self.cleaned_data['account_number'],
                 account_holder=self.cleaned_data['account_holder']
             )
-            Contract.objects.create(
-                contract_file=self.cleaned_data['contract_file']
-            )
+            if self.cleaned_data['service_use_contract_file']:
+                ServiceUseAgreement.objects.create(
+                    contract_file=self.cleaned_data['service_use_contract_file']
+                )
 
 class MemberRegistrationForm(forms.ModelForm):
     last_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
@@ -263,24 +264,37 @@ class MemberRegistrationForm(forms.ModelForm):
             'branch_name',
             'account_number',
             'account_holder',
-            'contract_file',
+            'service_use_contract_file',
+            'confidentiality_contract_file',
+            'outsourcing_contract_file',
             'referral_id'
         ]
 
     def save(self, commit=True):
         member = super().save(commit=False)
+        # OutsourcingAgreement, ConfidentialityAgreement, ServiceUseAgreement
         if commit:
             member.save()
-            BankAccount.objects.create(
+            MemberBankAccount.objects.create(
                 user=member.user,
                 bank_name=self.cleaned_data['bank_name'],
                 branch_name=self.cleaned_data['branch_name'],
                 account_number=self.cleaned_data['account_number'],
                 account_holder=self.cleaned_data['account_holder']
             )
-            Contract.objects.create(
-                contract_file=self.cleaned_data['contract_file']
-            )
+            if self.cleaned_data['service_use_contract_file']:
+                ServiceUseAgreement.objects.create(
+                    contract_file=self.cleaned_data['service_use_contract_file']
+                )
+            if self.cleaned_data['confidentiality_contract_file']:
+                ConfidentialityAgreement.objects.create(
+                    contract_file=self.cleaned_data['confidentiality_contract_file']
+                )
+            if self.cleaned_data['outsourcing_contract_file']:
+                OutsourcingAgreement.objects.create(
+                    contract_file=self.cleaned_data['outsourcing_contract_file']
+                )
+
         return member
 
     def generate_unique_referral_id(self):
@@ -289,24 +303,60 @@ class MemberRegistrationForm(forms.ModelForm):
             if not Member.objects.filter(referral_id=referral_id).exists():
                 return referral_id
 
-class ContractUploadForm(forms.ModelForm):
+class OutsourcingAgreementUploadForm(forms.ModelForm):
     class Meta:
-        model = Contract
-        fields = ['contract_file']
+        model = OutsourcingAgreement
+        fields = ['outsourcing_contract_file']
 
 
-# class BankAccountForm(forms.ModelForm):
-#     bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名')
-#     branch_name = forms.ChoiceField(label='支店名')
-#
-#     class Meta:
-#         model = BankAccount
-#         fields = ['bank_name', 'branch_name', 'account_number', 'account_holder']
-#
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         if 'bank_name' in self.data:
-#             self.fields['branch_name'].choices = get_branch_list(self.data['bank_name'])
-#         elif self.instance.pk:
-#             self.fields['branch_name'].choices = get_branch_list(self.instance.bank_name)
+class ConfidentialityAgreementUploadForm(forms.ModelForm):
+    class Meta:
+        model = ConfidentialityAgreement
+        fields = ['confidentiality_contract_file']
+
+
+class ServiceUseAgreementUploadForm(forms.ModelForm):
+    class Meta:
+        model = ServiceUseAgreement
+        fields = ['service_use_contract_file']
+
+
+class CustomerBankAccountForm(forms.ModelForm):
+    bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名')
+    branch_name = forms.ChoiceField(label='支店名')
+
+    class Meta:
+        model = CustomerBankAccount
+        fields = ['bank_name', 'branch_name', 'account_number', 'account_holder']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'bank_name' in self.data:
+            self.fields['branch_name'].choices = get_branch_list(self.data['bank_name'])
+        elif self.instance.pk:
+            self.fields['branch_name'].choices = get_branch_list(self.instance.bank_name)
+
+
+class MemberBankAccountForm(forms.ModelForm):
+    bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名')
+    branch_name = forms.ChoiceField(label='支店名')
+
+    class Meta:
+        model = MemberBankAccount
+        fields = ['bank_name', 'branch_name', 'account_number', 'account_holder']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'bank_name' in self.data:
+            self.fields['branch_name'].choices = get_branch_list(self.data['bank_name'])
+        elif self.instance.pk:
+            self.fields['branch_name'].choices = get_branch_list(self.instance.bank_name)
+
+
+
+
+
+
+
+
 

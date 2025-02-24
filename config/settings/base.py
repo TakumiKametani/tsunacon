@@ -44,9 +44,13 @@ INSTALLED_APPS = [
 
 INSTALLED_APPS += [
     'account',
-    'material_request',
     'dashboard',
+    'department',
     'info',
+    'invoice',
+    'material_request',
+    'payment',
+    'ticket'
 ]
 
 MIDDLEWARE = [

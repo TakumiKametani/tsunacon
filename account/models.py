@@ -43,12 +43,29 @@ class CustomUser(AbstractUser):
     privacy_policy_accepted = models.BooleanField(default=False, verbose_name='プライバシーポリシーを読了しました')
 
 
-class Contract(models.Model):
+class ServiceUseAgreement(models.Model):
     name = models.CharField(max_length=255)
     contract_file = models.FileField(upload_to=get_upload_to_contract)
 
     def __str__(self):
         return f"{self.name}: {self.contract_file.url}"
+
+
+class ConfidentialityAgreement(models.Model):
+    name = models.CharField(max_length=255)
+    contract_file = models.FileField(upload_to=get_upload_to_contract)
+
+    def __str__(self):
+        return f"{self.name}: {self.contract_file.url}"
+
+
+class OutsourcingAgreement(models.Model):
+    name = models.CharField(max_length=255)
+    contract_file = models.FileField(upload_to=get_upload_to_contract)
+
+    def __str__(self):
+        return f"{self.name}: {self.contract_file.url}"
+
 
 class UserBaseModel(models.Model):
     last_name = models.CharField(max_length=255)
@@ -57,7 +74,9 @@ class UserBaseModel(models.Model):
     first_name_kana = models.CharField(max_length=255, validators=[validate_katakana])
     phone = models.CharField(max_length=20)
     registration_date = models.DateTimeField(auto_now_add=True)
-    contract = models.ForeignKey(Contract, on_delete=models.CASCADE, null=True, blank=True)
+    service_use_contract = models.ForeignKey(ServiceUseAgreement, on_delete=models.CASCADE, null=True, blank=True)
+    confidentiality_contract = models.ForeignKey(ConfidentialityAgreement, on_delete=models.CASCADE, null=True, blank=True)
+    outsourcing_contract = models.ForeignKey(OutsourcingAgreement, on_delete=models.CASCADE, null=True, blank=True)
     postal_code = models.CharField(max_length=10, help_text="郵便番号ハイフンなし")
     address_1 = models.CharField(max_length=255, help_text="番地まで")
     address_2 = models.CharField(max_length=255, help_text="ビルやアパートの名称◎号室", null=True, blank=True)
@@ -106,14 +125,31 @@ class Customer(UserBaseModel, TimeStampedModel):
 
 
 class BankAccount(TimeStampedModel):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     bank_name = EncryptedCharField(max_length=255)
     branch_name = EncryptedCharField(max_length=255)
     account_number = EncryptedCharField(max_length=20)
     account_holder = EncryptedCharField(max_length=255)
 
+    class Meta:
+        abstract = True
+
+
+class CustomerBankAccount(BankAccount):
+    '''
+    バーチャル口座番号を発行するので、顧客に支払いをしてもらう口座紐づきテーブル
+    '''
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     def __str__(self):
-        return f"{self.bank_name} - {self.account_number}"
+        return f"{self.customer} - {self.account_number}"
+
+
+class MemberBankAccount(BankAccount):
+    '''
+    つな○○に報酬を支払うための口座紐づきテーブル
+    '''
+    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    def __str__(self):
+        return f"{self.member} - {self.bank_name} - {self.account_number}"
 
 
 class Discount(models.Model):

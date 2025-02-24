@@ -4,6 +4,7 @@
 {% block content %}
 <div class="w-full px-8 py-10 mx-auto overflow-hidden bg-white rounded-lg shadow-2xl dark:bg-gray-900 lg:max-w-xl shadow-gray-300/50 dark:shadow-black/50">
                             <h1 class="text-lg font-medium text-gray-700">資料請求フォーム</h1>
+	メモ：企業様の場合は、会社名も入力できるようにしたい。企業系なのか、個人なのかの選択ができるようにすれば、項目を増減させていけるかな
         <form method="post">
             {% csrf_token %}
             <div class="mb-4">

@@ -13,16 +13,13 @@ from . import forms
 from django.shortcuts import render, redirect
 from django.views import View
 from django.http.response import JsonResponse
-from .models import BankAccount
+from .models import CustomerBankAccount, MemberBankAccount
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
-from .forms import CustomerRegistrationForm, MemberRegistrationForm, ContractUploadForm
+from .forms import CustomerRegistrationForm, MemberRegistrationForm, OutsourcingAgreementUploadForm, ServiceUseAgreementUploadForm, ConfidentialityAgreementUploadForm
 
 from utils.zengin_code_utils import get_branch_list
-
-from axes.helpers import get_lockout_message
-from axes.models import AccessAttempt
 
 
 class TopView(TemplateView):
@@ -120,19 +117,34 @@ class CustomerRegistrationView(View):
 
     def get(self, request):
         form = CustomerRegistrationForm()
-        contract_form = ContractUploadForm()
-        return render(request, self.template_name, {'form': form, 'contract_form': contract_form})
+        service_use_contract_form = ServiceUseAgreementUploadForm()
+        return render(
+            request, self.template_name,
+            {
+                'form': form,
+                'service_use_contract_form': service_use_contract_form,
+            }
+        )
 
     def post(self, request):
         form = CustomerRegistrationForm(request.POST)
-        contract_form = ContractUploadForm(request.POST, request.FILES)
-        if form.is_valid() and contract_form.is_valid():
-            contract = contract_form.save()
+        service_use_contract_form = ServiceUseAgreementUploadForm(request.POST, request.FILES)
+
+        if form.is_valid():
             customer = form.save(commit=False)
-            customer.contract = contract
+            if service_use_contract_form.is_valid():
+                contract = service_use_contract_form.save()
+                customer.service_use_contract = contract
             customer.save()
             return redirect('registration_success')
-        return render(request, self.template_name, {'form': form, 'contract_form': contract_form})
+        return render(
+            request,
+            self.template_name,
+            {
+                'form': form,
+                'service_use_contract_form': service_use_contract_form
+            }
+        )
 
 @method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
 class MemberRegistrationView(View):
@@ -140,76 +152,118 @@ class MemberRegistrationView(View):
 
     def get(self, request):
         form = MemberRegistrationForm()
-        contract_form = ContractUploadForm()
-        return render(request, self.template_name, {'form': form, 'contract_form': contract_form})
+        outsourcing_contract_form = OutsourcingAgreementUploadForm()
+        service_use_contract_form = ServiceUseAgreementUploadForm()
+        confidentiality_contract_form = ConfidentialityAgreementUploadForm()
+        return render(
+            request,
+            self.template_name,
+            {
+                'form': form,
+                'outsourcing_contract_form': outsourcing_contract_form,
+                'service_use_contract_form': service_use_contract_form,
+                'confidentiality_contract_form': confidentiality_contract_form
+            }
+        )
 
     def post(self, request):
         form = MemberRegistrationForm(request.POST)
-        contract_form = ContractUploadForm(request.POST, request.FILES)
-        if form.is_valid() and contract_form.is_valid():
-            contract = contract_form.save()
+        outsourcing_contract_form = OutsourcingAgreementUploadForm()
+        service_use_contract_form = ServiceUseAgreementUploadForm()
+        confidentiality_contract_form = ConfidentialityAgreementUploadForm()
+        if form.is_valid():
             member = form.save(commit=False)
-            member.contract = contract
+            if service_use_contract_form.is_valid():
+                contract = service_use_contract_form.save()
+                member.service_use_contract = contract
+            if outsourcing_contract_form.is_valid():
+                contract = outsourcing_contract_form.save()
+                member.outsourcing_contract = contract
+            if confidentiality_contract_form.is_valid():
+                contract = confidentiality_contract_form.save()
+                member.confidentiality_contract = contract
             member.save()
             return redirect('registration_success')
-        return render(request, self.template_name, {'form': form, 'contract_form': contract_form})
+        return render(
+            request,
+            self.template_name,
+            {
+                'form': form,
+                'outsourcing_contract_form': outsourcing_contract_form,
+                'service_use_contract_form': service_use_contract_form,
+                'confidentiality_contract_form': confidentiality_contract_form
+            }
+        )
 
-@method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
-class SalesRegistrationView(View):
-    template_name = 'account/sales_registration.html'
-
-    def get(self, request):
-        form = SalesRegistrationForm()
-        contract_form = ContractUploadForm()
-        return render(request, self.template_name, {'form': form, 'contract_form': contract_form})
-
-    def post(self, request):
-        form = SalesRegistrationForm(request.POST)
-        contract_form = ContractUploadForm(request.POST, request.FILES)
-        if form.is_valid() and contract_form.is_valid():
-            contract = contract_form.save()
-            sales = form.save(commit=False)
-            sales.contract = contract
-            sales.save()
-            return redirect('registration_success')
-        return render(request, self.template_name, {'form': form, 'contract_form': contract_form})
 
 def registration_success(request):
     return render(request, 'account/registration_success.html')
 
 
-class BankAccountCreateView(View):
+class CustomerBankAccountCreateView(View):
     template_name = 'account/bank_account_form.html'
 
     def get(self, request):
-        form = forms.BankAccountForm()
+        form = forms.CustomerBankAccountForm()
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
-        form = forms.BankAccountForm(request.POST)
+        form = forms.CustomerBankAccountForm(request.POST)
         if form.is_valid():
             bank_account = form.save(commit=False)
-            bank_account.user = request.user
             bank_account.save()
             return redirect('bank_account_success')
         return render(request, self.template_name, {'form': form})
 
-class BankAccountEditView(View):
+class CustomerBankAccountEditView(View):
     template_name = 'account/bank_account_form.html'
 
     def get(self, request, pk):
-        bank_account = BankAccount.objects.get(pk=pk, user=request.user)
-        form = forms.BankAccountForm(instance=bank_account)
+        bank_account = CustomerBankAccount.objects.get(pk=pk, user=request.user)
+        form = forms.CustomerBankAccountForm(instance=bank_account)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request, pk):
-        form = forms.BankAccountForm(request.POST)
+        form = forms.CustomerBankAccountForm(request.POST)
         if form.is_valid():
             bank_account = form.save(commit=False)
-            bank_account.user = request.user
             bank_account.save()
             return redirect('bank_account_success')
         return render(request, self.template_name, {'form': form})
+
+
+class MemberBankAccountCreateView(View):
+    template_name = 'account/bank_account_form.html'
+
+    def get(self, request):
+        form = forms.MemberBankAccountForm()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = forms.MemberBankAccountForm(request.POST)
+        if form.is_valid():
+            bank_account = form.save(commit=False)
+            bank_account.save()
+            return redirect('bank_account_success')
+        return render(request, self.template_name, {'form': form})
+
+class MemberBankAccountEditView(View):
+    template_name = 'account/bank_account_form.html'
+
+    def get(self, request, pk):
+        bank_account = MemberBankAccount.objects.get(pk=pk, user=request.user)
+        form = forms.MemberBankAccountForm(instance=bank_account)
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request, pk):
+        form = forms.MemberBankAccountForm(request.POST)
+        if form.is_valid():
+            bank_account = form.save(commit=False)
+            bank_account.save()
+            return redirect('bank_account_success')
+        return render(request, self.template_name, {'form': form})
+
+
 
 def bank_account_success(request):
     return render(request, 'account/bank_account_success.html')

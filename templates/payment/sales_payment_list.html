@@ -1,14 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sales Payment List</title>
-    <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
-    <script src="{% static 'node_modules/alpinejs/dist/alpine.js' %}" defer></script>
-    <script src="{% static 'node_modules/chart.js/dist/chart.umd.js' %}" defer></script>
-</head>
-<body>
+{% extends 'login_base.html' %}
+{% block title %}資料請求フォーム{% endblock %}
+
+{% block content %}
     <div class="container mx-auto p-4">
         <h1 class="text-2xl font-bold">Sales Payment List</h1>
         
@@ -57,5 +50,4 @@
             });
         </script>
     </div>
-</body>
-</html>
+{% endblock %}

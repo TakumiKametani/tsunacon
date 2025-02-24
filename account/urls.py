@@ -18,7 +18,6 @@ urlpatterns = [
     # 本登録
     path('customer_registration/', views.CustomerRegistrationView.as_view(), name='customer_registration'),
     path('member_registration/', views.MemberRegistrationView.as_view(), name='member_registration'),
-    path('sales_registration/', views.SalesRegistrationView.as_view(), name='sales_registration'),
     path('registration_success/', views.registration_success, name='registration_success'),
     # パスワード変更
     path('password-change/', views.CustomPasswordChangeView.as_view(), name='password_change'),
@@ -30,8 +29,10 @@ urlpatterns = [
     path('password-reset-confirm/<uidb64>/<token>/', views.CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('password-reset-complete/', views.CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
     # 銀行口座登録
-    path('bank_account/create/', views.BankAccountCreateView.as_view(), name='bank_account_create'),
-    path('bank_account/edit/<int:pk>/', views.BankAccountEditView.as_view(), name='bank_account_edit'),
+    path('customer_bank_account/create/', views.CustomerBankAccountCreateView.as_view(), name='customer_bank_account_create'),
+    path('customer_bank_account/edit/<int:pk>/', views.CustomerBankAccountEditView.as_view(), name='customer_bank_account_edit'),
+    path('member_bank_account/create/', views.MemberBankAccountCreateView.as_view(), name='member_bank_account_create'),
+    path('member_bank_account/edit/<int:pk>/', views.MemberBankAccountEditView.as_view(), name='member_bank_account_edit'),
     path('bank_account/success/', views.bank_account_success, name='bank_account_success'),
     path('get_branches/', views.get_branches, name='get_branches'),
 ]
