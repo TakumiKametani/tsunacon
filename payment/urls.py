@@ -1,6 +1,8 @@
 from django.urls import path
 from .views import PaymentListView, PaymentDetailView, SalesPaymentListView, SalesPaymentDetailView, CustomerPaymentStatusCreateView, MemberSalesPaymentStatusCreateView, customer_payment_status_success, member_sales_payment_status_success
 
+app_name = 'payment'
+
 urlpatterns = [
     path('payments/', PaymentListView.as_view(), name='payment_list'),
     path('payments/<int:year>/<int:month>/', PaymentDetailView.as_view(), name='payment_detail'),

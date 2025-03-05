@@ -1,5 +1,5 @@
 from django import forms
-from .models import Department, ContactPerson
+from .models import Department, Person
 
 class DepartmentForm(forms.ModelForm):
     class Meta:
@@ -8,5 +8,13 @@ class DepartmentForm(forms.ModelForm):
 
 class ContactPersonForm(forms.ModelForm):
     class Meta:
-        model = ContactPerson
-        fields = ['name', 'email', 'phone', 'department']
+        model = Person
+        fields = [
+            'last_name',
+            'first_name',
+            'last_name_kana',
+            'first_name_kana',
+            'phone',
+            'notification_email',
+            'department'
+        ]

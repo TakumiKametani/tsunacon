@@ -3,7 +3,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views import View
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.shortcuts import render, get_object_or_404, redirect
-from .models import Project, ChatMessage
+from .models import Project, ChatMessage, Grade
 from .forms import ProjectForm, ChatMessageForm
 from django.http import JsonResponse
 
@@ -70,3 +70,11 @@ class ChatMessageDeleteView(View, LoginRequiredMixin):
         project_pk = chat_message.project.pk
         chat_message.delete()
         return JsonResponse({'status': 'success', 'message': 'Chat message deleted successfully', 'project_pk': project_pk})
+
+
+def get_grade_price(request):
+    grade_id = request.GET.get('grade_id')
+    if grade_id:
+        grade = get_object_or_404(Grade, id=grade_id)
+        return JsonResponse({'price': str(grade.price)})
+    return JsonResponse({'price': ''})

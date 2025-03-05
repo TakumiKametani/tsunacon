@@ -1,5 +1,14 @@
 from django.urls import path
-from .views import ProjectListView, ProjectDetailView, ProjectUpdateView, ProjectCreateView, ChatMessageCreateView, ChatMessageUpdateView, ChatMessageDeleteView
+from .views import (
+    ProjectListView,
+    ProjectDetailView,
+    ProjectUpdateView,
+    ProjectCreateView,
+    ChatMessageCreateView,
+    ChatMessageUpdateView,
+    ChatMessageDeleteView,
+    get_grade_price
+)
 
 app_name = 'dashboard'
 
@@ -11,4 +20,5 @@ urlpatterns = [
     path('chat_message/create/', ChatMessageCreateView.as_view(), name='chat_message_create'),
     path('chat_message/update/<int:pk>/', ChatMessageUpdateView.as_view(), name='chat_message_update'),
     path('chat_message/delete/<int:pk>/', ChatMessageDeleteView.as_view(), name='chat_message_delete'),
+    path('get_grade_price/', get_grade_price, name='get_grade_price'),
 ]

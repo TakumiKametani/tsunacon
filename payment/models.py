@@ -1,5 +1,5 @@
 from django.db import models
-from account.models import Customer, Member, Sales, CustomUser
+from account.models import Customer, Member, CustomUser
 from dashboard.models import Project
 from datetime import date
 
@@ -27,7 +27,7 @@ class Payment(models.Model):
 
 
 class SalesPayment(models.Model):
-    sales = models.ForeignKey(Sales, on_delete=models.CASCADE)
+    sales = models.ForeignKey(Member, on_delete=models.CASCADE)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=10, decimal_places=2)
     date = models.DateField()

@@ -3,6 +3,7 @@ from .models import Project, ChatMessage, Grade
 
 
 class ProjectForm(forms.ModelForm):
+    price = forms.DecimalField(label="Price", max_digits=10, decimal_places=2, required=False)
     class Meta:
         model = Project
         fields = [
@@ -25,6 +26,12 @@ class ProjectForm(forms.ModelForm):
             'start_date': '開始日',
             'end_date': '終了日',
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance.pk:
+            self.fields['price'].initial = self.instance.grade.price
+            self.fields['price'].widget.attrs['readonly'] = True
+
 
 class ChatMessageForm(forms.ModelForm):
     class Meta:

@@ -106,7 +106,7 @@ class Member(UserBaseModel, TimeStampedModel):
 class MemberProfile(TimeStampedModel):
     member = models.ForeignKey(Member, related_name='member', on_delete=models.CASCADE)
     gender = models.CharField(max_length=2, choices=GENDER_TYPE)
-    age = models.PositiveSmallIntegerField(max_length=2, null=True, blank=True)
+    age = models.PositiveSmallIntegerField(null=True, blank=True)
     description = models.TextField(null=True, blank=True, help_text='簡易的な経歴等の記載', verbose_name='自己PR')
     port_folio = models.URLField(null=True, blank=True)
     resume = models.FileField(upload_to=get_upload_to_resume, null=True, blank=True)  # 動的パス

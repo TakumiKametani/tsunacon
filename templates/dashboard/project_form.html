@@ -8,3 +8,23 @@
     <button type="submit" class="bg-blue-500 text-white p-2 rounded">Save Changes</button>
 </form>
 {% endblock %}
+{% block js_extra %}
+<script>
+		$(document).ready(function() {
+				$('#id_grade').change(function() {
+						var grade_id = $(this).val();
+						if (grade_id) {
+								$.ajax({
+										url: '/get_grade_price/', // エンドポイントを適宜変更してください
+										data: {'grade_id': grade_id},
+										success: function(data) {
+												$('#id_price').val(data.price);
+										}
+								});
+						} else {
+								$('#id_price').val('');
+						}
+				});
+		});
+</script>
+{% endblock %}

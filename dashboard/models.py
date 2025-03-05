@@ -25,6 +25,18 @@ STATUS = [
 
 
 class Grade(TimeStampedModel):
+    """
+    つなスパの時給を登録していく。そこから自動計算。
+    Grade-1 1000
+    Grade-2 1200
+    Grade-3 1500
+    Grade-4 1800
+    Grade-5 2000
+    Grade-6 2500
+    Grade-7 3000
+    Grade-8 3500
+    Grade-9 4000
+    """
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
@@ -69,3 +81,15 @@ class Cancellation(TimeStampedModel):
 
     def __str__(self):
         return f"{self.project.name} - {self.member.name} - {self.tuna_type}"
+
+
+class MainTag(TimeStampedModel):
+    name = models.CharField()
+
+
+class SubTag(TimeStampedModel):
+    main = models.ForeignKey(MainTag, on_delete=models.SET_NULL)
+    name = models.CharField()
+    description = models.TextField(null=True, blank=True)
+
+

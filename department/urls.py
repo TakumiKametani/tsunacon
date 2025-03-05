@@ -1,6 +1,8 @@
 from django.urls import path
 from .views import DepartmentCreateView, ContactPersonCreateView, department_success, contact_person_success, ProjectCreateView, project_success
 
+app_name = 'department'
+
 urlpatterns = [
     path('department/create/', DepartmentCreateView.as_view(), name='department_create'),
     path('contact_person/create/', ContactPersonCreateView.as_view(), name='contact_person_create'),

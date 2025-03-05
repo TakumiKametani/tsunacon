@@ -182,7 +182,7 @@ class CustomerRegistrationForm(forms.ModelForm):
     branch_name = forms.ChoiceField(label='支店名')
     account_number = forms.CharField(max_length=20)
     account_holder = forms.CharField(max_length=255)
-    contract_file = forms.FileField()
+    service_use_contract_file = forms.FileField()
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -236,7 +236,9 @@ class MemberRegistrationForm(forms.ModelForm):
     branch_name = forms.ChoiceField(label='支店名')
     account_number = forms.CharField(max_length=20)
     account_holder = forms.CharField(max_length=255)
-    contract_file = forms.FileField()
+    service_use_contract_file = forms.FileField()
+    confidentiality_contract_file = forms.FileField()
+    outsourcing_contract_file = forms.FileField()
     user_types = forms.ModelMultipleChoiceField(queryset=UserType.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
 
     def __init__(self, *args, **kwargs):
@@ -306,19 +308,19 @@ class MemberRegistrationForm(forms.ModelForm):
 class OutsourcingAgreementUploadForm(forms.ModelForm):
     class Meta:
         model = OutsourcingAgreement
-        fields = ['outsourcing_contract_file']
+        fields = ['contract_file']
 
 
 class ConfidentialityAgreementUploadForm(forms.ModelForm):
     class Meta:
         model = ConfidentialityAgreement
-        fields = ['confidentiality_contract_file']
+        fields = ['contract_file']
 
 
 class ServiceUseAgreementUploadForm(forms.ModelForm):
     class Meta:
         model = ServiceUseAgreement
-        fields = ['service_use_contract_file']
+        fields = ['contract_file']
 
 
 class CustomerBankAccountForm(forms.ModelForm):

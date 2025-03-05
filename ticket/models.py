@@ -1,10 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
+from account.models import CustomUser
 from dashboard.models import Project
 
 class Ticket(models.Model):
-    requester = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requested_tickets')
-    assignee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='assigned_tickets')
+    requester = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='requested_user')
+    assignee = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='assigned_user')
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     num_tickets = models.IntegerField()
     created = models.DateTimeField(auto_now_add=True)
