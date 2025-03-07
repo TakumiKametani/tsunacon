@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block title %}つな - お知らせ{% endblock %}
+{% block content %}
+    <div class="container mx-auto p-4">
+    <h1>お知らせ一覧</h1>
+    <h1>{{ announcement.title }}</h1>
+    <p>{{ announcement.content }}</p>
+    <p><small>Created at: {{ announcement.created }}</small></p>
+		<a href="{% url 'info:announcement_list' %}" class="text-blue-500">お知らせ一覧に戻る</a>
+    </div>
+{% endblock %}

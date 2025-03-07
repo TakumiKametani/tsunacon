@@ -84,12 +84,12 @@ class Cancellation(TimeStampedModel):
 
 
 class MainTag(TimeStampedModel):
-    name = models.CharField()
+    name = models.CharField(max_length=255)
 
 
 class SubTag(TimeStampedModel):
-    main = models.ForeignKey(MainTag, on_delete=models.SET_NULL)
-    name = models.CharField()
+    main = models.ForeignKey(MainTag, null=True, on_delete=models.SET_NULL)
+    name = models.CharField(max_length=255)
     description = models.TextField(null=True, blank=True)
 
 

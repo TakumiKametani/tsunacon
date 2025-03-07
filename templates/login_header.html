@@ -15,7 +15,7 @@
               </a>
             </li>
 						<li>
-              <a href="{% url 'info:information' %}" class="nav-link {% if 'info/information' in request.path %}text-secondary{% else %}text-white{% endif %}">
+              <a href="{% url 'info:announcement_list' %}" class="nav-link {% if 'info/announcement' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/info.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
                 お知らせ
               </a>

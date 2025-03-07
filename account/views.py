@@ -13,7 +13,7 @@ from . import forms
 from django.shortcuts import render, redirect
 from django.views import View
 from django.http.response import JsonResponse
-from .models import CustomerBankAccount, MemberBankAccount
+from .models import LoginStatus, CustomerBankAccount, MemberBankAccount
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
@@ -35,9 +35,21 @@ class AdminLoginView(LoginView):
 class CustomerLoginView(LoginView):
     template_name = 'account/customer_login.html'
 
+    def form_valid(self, form):
+        user = form.get_user()
+        # ログインタイプを判別して更新
+        LoginStatus.objects.update_or_create(user=user, defaults={'is_customer': True, 'is_member': False})
+        return redirect(self.get_success_url())
+
 
 class MemberLoginView(LoginView):
     template_name = 'account/member_login.html'
+
+    def form_valid(self, form):
+        user = form.get_user()
+        # ログインタイプを判別して更新
+        LoginStatus.objects.update_or_create(user=user, defaults={'is_customer': False, 'is_member': True})
+        return redirect(self.get_success_url())
 
 
 class LoginChoiceView(TemplateView):

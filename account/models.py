@@ -124,6 +124,12 @@ class Customer(UserBaseModel, TimeStampedModel):
         return f"{self.customer_type} - {self.name}"
 
 
+class LoginStatus(models.Model):
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    is_customer = models.BooleanField(default=False)
+    is_member = models.BooleanField(default=False)
+
+
 class BankAccount(TimeStampedModel):
     bank_name = EncryptedCharField(max_length=255)
     branch_name = EncryptedCharField(max_length=255)

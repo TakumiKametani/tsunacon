@@ -76,3 +76,19 @@ python manage.py makemigrations
 python manage.py migrations
 ```
 
+### 11. superuser作成
+
+Pycharm画面左下のターミナルのアイコンをクリックすると、
+仮想環境を展開した状態でターミナルが起動される
+
+```ユーザー作成コマンド
+python manage.py createsuperuser
+ユーザー名: <入力する>
+Email: <入力する>
+Password: <入力する>
+Password (again): <入力する>
+```
+
+### 12. runserverを起動しログインする
+
+> http://localhost:8000/admin_login
