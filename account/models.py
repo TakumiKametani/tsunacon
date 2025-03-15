@@ -98,6 +98,10 @@ class Member(UserBaseModel, TimeStampedModel):
     user_types = models.ManyToManyField(UserType, related_name='members')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='member_profiles')
     referral_id = models.CharField(max_length=100)
+    last_modifier = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL, related_name='member_last_modifier')
+    last_modified = models.DateField(null=True, blank=True)
+    is_active = models.BooleanField(default=False)
+    is_terminated = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.user_types} - {self.last_name} {self.first_name}({self.last_name_kana} {self.first_name_kana}) - {self.referral_id}"
@@ -119,6 +123,10 @@ class Customer(UserBaseModel, TimeStampedModel):
     payment_due_day = models.IntegerField(null=True, blank=True)
     referral_member = models.ForeignKey(Member, related_name='referral_member', blank=True, null=True, on_delete=models.CASCADE)
     service_started = models.DateField(null=True, blank=True)
+    last_modifier = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL, related_name='customer_last_modifier')
+    last_modified = models.DateField(null=True, blank=True)
+    is_active = models.BooleanField(default=False)
+    is_terminated = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.customer_type} - {self.name}"
@@ -144,7 +152,7 @@ class CustomerBankAccount(BankAccount):
     '''
     バーチャル口座番号を発行するので、顧客に支払いをしてもらう口座紐づきテーブル
     '''
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='customer_bank')
     def __str__(self):
         return f"{self.customer} - {self.account_number}"
 
@@ -153,7 +161,7 @@ class MemberBankAccount(BankAccount):
     '''
     つな○○に報酬を支払うための口座紐づきテーブル
     '''
-    member = models.ForeignKey(Member, on_delete=models.CASCADE)
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='member_bank')
     def __str__(self):
         return f"{self.member} - {self.bank_name} - {self.account_number}"
 

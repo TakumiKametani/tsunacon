@@ -4,6 +4,10 @@ from .forms import DepartmentForm, ContactPersonForm
 from account.models import Customer
 from .models import Department
 from django.core.mail import send_mail
+
+from dashboard.forms import ProjectForm
+from dashboard.models import Project
+
 class DepartmentCreateView(View):
     template_name = 'departments/department_form.html'
 
@@ -49,11 +53,6 @@ def department_success(request):
 def contact_person_success(request):
     return render(request, 'departments/success.html', {'message': 'Contact person created successfully'})
 
-
-from django.shortcuts import render, redirect
-from django.views import View
-from dashboard.forms import ProjectForm
-from dashboard.models import Project
 
 class ProjectCreateView(View):
     template_name = 'departments/project_form.html'

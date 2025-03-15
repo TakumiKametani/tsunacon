@@ -1,5 +1,7 @@
+
 import random
 import string
+import uuid
 
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm
 from django import forms
@@ -7,7 +9,7 @@ from .models import Customer, CustomerBankAccount, MemberBankAccount, Member, Ou
 from utils.zengin_code_utils import get_bank_list, get_branch_list
 from utils.validators import validate_katakana
 from django.contrib.auth import authenticate
-
+from account.models import CustomUser
 
 
 class EmailAuthenticationForm(AuthenticationForm):
@@ -119,7 +121,11 @@ class CustomerPreRegistrationForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         if commit:
-            instance.user.email = self.cleaned_data['email']
+            user = CustomUser.objects.create_user(
+                email=self.cleaned_data['email'],
+                username=uuid.uuid4().hex[:10],
+            )
+            instance.user = user
             instance.terms_accepted = self.cleaned_data['terms_accepted']
             instance.privacy_policy_accepted = self.cleaned_data['privacy_policy_accepted']
             instance.user.save()
@@ -166,7 +172,10 @@ class MemberPreRegistrationForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         if commit:
-            instance.user.email = self.cleaned_data['email']
+            user = CustomUser.objects.create_user(
+                email=self.cleaned_data['email'],
+            )
+            instance.user = user
             instance.terms_accepted = self.cleaned_data['terms_accepted']
             instance.privacy_policy_accepted = self.cleaned_data['privacy_policy_accepted']
             instance.user.save()
@@ -175,7 +184,7 @@ class MemberPreRegistrationForm(forms.ModelForm):
 
 
 
-class CustomerRegistrationForm(forms.ModelForm):
+class CustomerRegistrationDetailForm(forms.ModelForm):
     last_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     first_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名')
@@ -189,7 +198,13 @@ class CustomerRegistrationForm(forms.ModelForm):
         if 'bank_name' in self.data:
             self.fields['branch_name'].choices = get_branch_list(self.data['bank_name'])
         elif self.instance.pk:
-            self.fields['branch_name'].choices = get_branch_list(self.instance.bank_name)
+            customer_bank = self.instance.customer_bank.filter(customer=self.instance).first()
+            bank_name = customer_bank.bank_name if customer_bank else '0001'
+            self.fields['branch_name'].choices = get_branch_list(bank_name)
+        _class = 'block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40'
+        for field in self.fields.values():
+            field.widget.attrs['disabled'] = 'disabled'
+            field.widget.attrs['class'] = _class
 
     class Meta:
         model = Customer
@@ -211,6 +226,10 @@ class CustomerRegistrationForm(forms.ModelForm):
             'account_number',
             'account_holder',
             'service_use_contract_file',
+            'is_active',
+            'is_terminated',
+            'last_modified',
+            'last_modifier',
         ]
 
     def save(self, commit=True):
@@ -229,7 +248,95 @@ class CustomerRegistrationForm(forms.ModelForm):
                     contract_file=self.cleaned_data['service_use_contract_file']
                 )
 
-class MemberRegistrationForm(forms.ModelForm):
+
+class MemberRegistrationDetailForm(forms.ModelForm):
+    last_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
+    first_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
+    bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名')
+    branch_name = forms.ChoiceField(label='支店名')
+    account_number = forms.CharField(max_length=20)
+    account_holder = forms.CharField(max_length=255)
+    service_use_contract_file = forms.FileField()
+    confidentiality_contract_file = forms.FileField()
+    outsourcing_contract_file = forms.FileField()
+    user_types = forms.ModelMultipleChoiceField(queryset=UserType.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if 'bank_name' in self.data:
+            self.fields['branch_name'].choices = get_branch_list(self.data['bank_name'])
+        elif self.instance.pk:
+            member_bank = self.instance.member_bank.filter(customer=self.instance).first()
+            bank_name = member_bank.bank_name if member_bank else '0001'
+            self.fields['branch_name'].choices = get_branch_list(bank_name)
+        _class = 'block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40'
+        for field in self.fields.values():
+            field.widget.attrs['disabled'] = 'disabled'
+            field.widget.attrs['class'] = _class
+
+    class Meta:
+        model = Member
+        fields = [
+            'last_name',
+            'first_name',
+            'last_name_kana',
+            'first_name_kana',
+            'phone',
+            'postal_code',
+            'address_1',
+            'address_2',
+            'notification_email',
+            'user_types',
+            'referral_id',
+            'bank_name',
+            'branch_name',
+            'account_number',
+            'account_holder',
+            'service_use_contract_file',
+            'confidentiality_contract_file',
+            'outsourcing_contract_file',
+            'referral_id',
+            'is_active',
+            'is_terminated',
+            'last_modified',
+            'last_modifier',
+        ]
+
+    def save(self, commit=True):
+        member = super().save(commit=False)
+        # OutsourcingAgreement, ConfidentialityAgreement, ServiceUseAgreement
+        if commit:
+            member.save()
+            MemberBankAccount.objects.create(
+                user=member.user,
+                bank_name=self.cleaned_data['bank_name'],
+                branch_name=self.cleaned_data['branch_name'],
+                account_number=self.cleaned_data['account_number'],
+                account_holder=self.cleaned_data['account_holder']
+            )
+            if self.cleaned_data['service_use_contract_file']:
+                ServiceUseAgreement.objects.create(
+                    contract_file=self.cleaned_data['service_use_contract_file']
+                )
+            if self.cleaned_data['confidentiality_contract_file']:
+                ConfidentialityAgreement.objects.create(
+                    contract_file=self.cleaned_data['confidentiality_contract_file']
+                )
+            if self.cleaned_data['outsourcing_contract_file']:
+                OutsourcingAgreement.objects.create(
+                    contract_file=self.cleaned_data['outsourcing_contract_file']
+                )
+
+        return member
+
+    def generate_unique_referral_id(self):
+        while True:
+            referral_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
+            if not Member.objects.filter(referral_id=referral_id).exists():
+                return referral_id
+
+
+class MemberRegistrationUpdateForm(forms.ModelForm):
     last_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     first_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名')
@@ -247,6 +354,8 @@ class MemberRegistrationForm(forms.ModelForm):
             self.fields['branch_name'].choices = get_branch_list(self.data['bank_name'])
         elif self.instance.pk:
             self.fields['branch_name'].choices = get_branch_list(self.instance.bank_name)
+        for field in self.fields.values():
+            field.widget.attrs['readonly'] = 'readonly'
 
     class Meta:
         model = Member

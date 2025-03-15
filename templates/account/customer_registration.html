@@ -1,27 +1,149 @@
-{% extends 'login_base.html' %}
-{% block title %}Customer Registration{% endblock %}
+{% extends 'base.html' %}
+{% block title %}顧客登録詳細{% endblock %}
 {% block content %}
     <div class="container mx-auto p-4">
-        <h1 class="text-2xl font-bold">Customer Registration</h1>
+        <h1 class="text-2xl font-bold">顧客登録詳細</h1>
         <form method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Register</button>
-        </form>
-        <button @click="modalOpen = true" class="bg-gray-500 text-white px-4 py-2 rounded mt-4">Show Details</button>
-        <div x-show="modalOpen" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center" @click.away="modalOpen = false">
-            <div class="bg-white p-4 rounded">
-                <h2 class="text-xl font-bold">Registration Details</h2>
-                <p>Here you can provide additional details about the registration process.</p>
-                <button @click="modalOpen = false" class="bg-red-500 text-white px-4 py-2 rounded mt-4">Close</button>
-            </div>
-        </div>
-    </div>
-    <script>
-        document.addEventListener('alpine:init', () => {
-            Alpine.data('modal', () => ({
-                modalOpen: false,
-            }));
-        });
-    </script>
+					{% csrf_token %}
+					<div><p>メモ：企業や、組織、団体の場合は、会社名を必須で入力にしたい。会社名入力欄も入れ込みたい。</p>
+						<label for="id_customer_type" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">Customer Type:</label>
+						{{ customer.customer_type }}
+					</div>
+					<div>
+						<label for="id_last_name" class="block text-gray-700 mt-2">姓</label>
+						{{ customer.last_name }}
+					</div>
+					<div>
+						<label for="id_first_name" class="block text-gray-700 mt-2">名</label>
+						{{ customer.first_name }}
+					</div>
+					<div>
+						<label for="id_last_name_kana" class="block text-gray-700 mt-2">姓（カナ）</label>
+						{{ customer.last_name_kana }}
+					</div>
+					<div>
+						<label for="id_first_name_kana" class="block text-gray-700 mt-2">名（カナ）</label>
+						{{ customer.first_name_kana }}
+					</div>
+					<div>
+						<label for="id_phone" class="block text-gray-700 mt-2">電話番号</label>
+					{{ customer.phone }}
+					</div>
+					<div>
+						<label for="id_postal_code" class="block text-gray-700 mt-2">郵便番号</label>
+						{{ customer.postal_code }}
+					</div>
+					<div>
+						<label for="id_address_1" class="block text-gray-700 mt-2">住所</label>
+						{{ customer.address_1 }}
+					</div>
+					<div>
+						<label for="id_address_2" class="block text-gray-700 mt-2">建物/部屋番号</label>
+						{{ customer.address_2 }}
+					</div>
+					<div>
+						<label for="id_notification_email" class="block text-gray-700 mt-2">メールアドレス（通知）</label>
+						{{ customer.notification_email }}
+					</div>
+					<div>
+						<label for="id_billing_email" class="block text-gray-700 mt-2">メールアドレス（支払）</label>
+						{{ customer.billing_email }}
+					</div>
+					<div>
+						<label for="id_payment_due_day" class="block text-gray-700 mt-2">支払日</label>
+						{{ customer.payment_due_day }}
+					</div>
+					<div>
+						<label for="id_bank_name" class="block text-gray-700 mt-2">銀行名</label>
+						{{ customer.bank_name }}
+					</div>
+					<div>
+						<label for="id_branch_name" class="block text-gray-700 mt-2">支店名</label>
+						{{ customer.branch_name }}
+					</div>
+					<div>
+						<label for="id_account_number" class="block text-gray-700 mt-2">口座番号</label>
+						{{ customer.account_number }}
+					</div>
+					<div>
+						<label for="id_account_holder" class="block text-gray-700 mt-2">口座名</label>
+						{{ customer.account_holder }}
+					</div>
+					<div>
+						<label for="id_service_use_contract_file" class="block text-gray-700 mt-2">サービス利用契約書</label>
+						{{ customer.service_use_contract_file }}
+					</div>
+					<div>
+						<label for="id_is_active" class="block text-gray-700 mt-2">サービス利用可能フラグ</label>
+						{{ customer.is_active }}
+					</div>
+					<div>
+						<label for="id_is_terminated" class="block text-gray-700 mt-2">退会済フラグ</label>
+						{{ customer.is_terminated }}
+					</div>
+					<div>
+						<label for="id_last_modified" class="block text-gray-700 mt-2">最終更新日</label>
+						{{ customer.last_modified }}
+					</div>
+					<div>
+						<label for="id_last_modifier" class="block text-gray-700 mt-2">最終更新者</label>
+						{{ customer.last_modifier }}
+					</div>
+					<button type="submit" id="save_button" class="bg-blue-500 text-white px-4 py-2 rounded" style="display:none">保存</button>
+				</form>
+			<button id="read_button" class="bg-blue-500 text-white px-4 py-2 rounded" style="display:none">閲覧モード</button>
+			<button id="update_button" class="bg-blue-500 text-white px-4 py-2 rounded" style="display:block">入力モード</button>
+		</div>
+{% endblock %}
+{% block js_extra %}
+const update_button = document.getElementById('update_button');
+update_button.addEventListener('click', updateButton);
+
+const read_button = document.getElementById('read_button');
+read_button.addEventListener('click', readButton);
+
+const save_button = document.getElementById('save_button');
+
+function updateButton() {
+  let input_tags = document.querySelectorAll('input');
+  let select_tags = document.querySelectorAll('select');
+	for(var i=0; i < input_tags.length; i++) {
+		input_tags[i].removeAttribute('disabled');
+	}
+	for(var i=0; i < select_tags.length; i++) {
+		select_tags[i].removeAttribute('disabled');
+	}
+	update_button.setAttribute("style", "display: none;");
+	read_button.setAttribute("style", "display: block;");
+	save_button.setAttribute("style", "display: block;");
+}
+
+function readButton() {
+  let input_tags = document.querySelectorAll('input');
+	let select_tags = document.querySelectorAll('select');
+	for(var i=0; i < input_tags.length; i++) {
+		input_tags[i].setAttribute('disabled', true);
+	}
+	for(var i=0; i < select_tags.length; i++) {
+		select_tags[i].setAttribute('disabled', true);
+	}
+	read_button.setAttribute("style", "display: none;");
+	save_button.setAttribute("style", "display: none;");
+	update_button.setAttribute("style", "display: block;");
+}
+
+$(document).ready(function() {
+    $('#id_bank_name').select2({
+        placeholder: "選択肢を検索...",
+        allowClear: true
+    });
+});
+
+$(document).ready(function() {
+    $('#id_branch_name').select2({
+        placeholder: "選択肢を検索...",
+        allowClear: true
+    });
+});
+
 {% endblock %}

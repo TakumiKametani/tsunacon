@@ -8,12 +8,28 @@
           </a>
 
           <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
+						{% if request.user.is_authenticated and request.user.is_superuser %}
             <li>
+              <a href="{% url 'account:customer_registration_list' %}" class="nav-link {% if 'info' in request.path %}text-secondary{% else %}text-white{% endif %}">
+                <img src="{% static 'image/icon/info.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
+                顧客本登録
+              </a>
+            </li>
+						<li>
+              <a href="{% url 'account:member_registration_list' %}" class="nav-link {% if 'info' in request.path %}text-secondary{% else %}text-white{% endif %}">
+                <img src="{% static 'image/icon/info.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
+                会員本登録
+              </a>
+            </li>
+						
+						{% endif %}
+						<li>
               <a href="{% url 'info:announcement_list' %}" class="nav-link {% if 'info' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/info.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
                 Information
               </a>
             </li>
+						
             <li>
               <a href="{% url 'dashboard:project_list' %}" class="nav-link {% if 'dashboard' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/project.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
@@ -36,6 +52,11 @@
               <a href="#" class="nav-link {% if 'contact' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/contact.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
                 Contact
+              </a>
+            </li>
+            <li>
+              <a href="#" class="nav-link {% if 'profile' in request.path %}text-secondary{% else %}text-white{% endif %}">
+                {{ request.user.username }}
               </a>
             </li>
           </ul>

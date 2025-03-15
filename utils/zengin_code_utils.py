@@ -8,7 +8,7 @@ def get_branch_list(bank_code):
     branch_list = []
     try:
         branches = Bank[bank_code].branches
-        branch_list = [(branch['code'], branch['name']) for branch in branches]
+        branch_list = [(code, branch.name) for code, branch in branches.items()]
     except:
         pass
     return branch_list

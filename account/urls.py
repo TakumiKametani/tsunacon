@@ -4,6 +4,7 @@ from . import views
 
 
 app_name="account"
+
 urlpatterns = [
     path("", views.TopView.as_view(), name="top"),
     path("login_choice/", views.LoginChoiceView.as_view(), name="login_choice"),
@@ -16,8 +17,12 @@ urlpatterns = [
     path('member_pre_registration/', views.MemberPreRegistrationView.as_view(), name='member_pre_registration'),
     path('registration_pre_success/', views.registration_pre_success, name='registration_pre_success'),
     # 本登録
-    path('customer_registration/', views.CustomerRegistrationView.as_view(), name='customer_registration'),
-    path('member_registration/', views.MemberRegistrationView.as_view(), name='member_registration'),
+    path('customer_registration_list/', views.CustomerRegistrationListView.as_view(), name='customer_registration_list'),
+    path('customer_registration/edit/<int:pk>/', views.CustomerRegistrationDetailView.as_view(), name='customer_registration_detail'),
+    path('customer_registration/update/<int:pk>/', views.CustomerRegistrationUpdateView.as_view(), name='customer_registration_update'),
+    path('member_registration_list/', views.MemberRegistrationListView.as_view(), name='member_registration_list'),
+    path('member_registration/edit/<int:pk>/', views.MemberRegistrationDetailView.as_view(), name='member_registration_detail'),
+    path('member_registration/update/<int:pk>/', views.MemberRegistrationUpdateView.as_view(), name='member_registration_update'),
     path('registration_success/', views.registration_success, name='registration_success'),
     # パスワード変更
     path('password-change/', views.CustomPasswordChangeView.as_view(), name='password_change'),

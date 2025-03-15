@@ -1,6 +1,6 @@
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, DetailView, UpdateView
 from django.contrib.auth.views import (
     PasswordChangeView,
     PasswordChangeDoneView,
@@ -17,9 +17,10 @@ from .models import LoginStatus, CustomerBankAccount, MemberBankAccount
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
-from .forms import CustomerRegistrationForm, MemberRegistrationForm, OutsourcingAgreementUploadForm, ServiceUseAgreementUploadForm, ConfidentialityAgreementUploadForm
+from .forms import CustomerRegistrationDetailForm, CustomerRegistrationUpdateForm, MemberRegistrationDetailForm, MemberRegistrationUpdateForm, OutsourcingAgreementUploadForm, ServiceUseAgreementUploadForm, ConfidentialityAgreementUploadForm
 
 from utils.zengin_code_utils import get_branch_list
+from account.models import Customer, Member, CUSTOMER_TYPES
 
 
 class TopView(TemplateView):
@@ -97,7 +98,7 @@ class CustomerPreRegistrationView(View):
         form = forms.CustomerPreRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('registration_success')
+            return redirect('account:registration_success')
         return render(request, self.template_name, {'form': form})
 
 
@@ -112,7 +113,7 @@ class MemberPreRegistrationView(View):
         form = forms.MemberPreRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('registration_success')
+            return redirect('account:registration_success')
         return render(request, self.template_name, {'form': form})
 
 
@@ -123,89 +124,53 @@ def registration_pre_success(request):
 def is_admin(user):
     return user.is_superuser
 
+
 @method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
-class CustomerRegistrationView(View):
+class CustomerRegistrationListView(View):
+    template_name = 'account/customer_registration_list.html'
+
+    def get(self, request):
+        customers = Customer.objects.all()
+        return render(request, self.template_name, {'customers': customers})
+
+
+@method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
+class CustomerRegistrationDetailView(DetailView):
+    model = Customer
     template_name = 'account/customer_registration.html'
+    form_class = CustomerRegistrationDetailForm
 
-    def get(self, request):
-        form = CustomerRegistrationForm()
-        service_use_contract_form = ServiceUseAgreementUploadForm()
-        return render(
-            request, self.template_name,
-            {
-                'form': form,
-                'service_use_contract_form': service_use_contract_form,
-            }
-        )
+    def get_context_data(self, **kwargs):
+        # 既存の context データを取得
+        context = super().get_context_data(**kwargs)
+        # カスタムデータを追加
+        context['customer'] = self.form_class(instance=self.object)  # 詳細表示用フォーム
+        context['customer_types'] = CUSTOMER_TYPES
+        return context
 
-    def post(self, request):
-        form = CustomerRegistrationForm(request.POST)
-        service_use_contract_form = ServiceUseAgreementUploadForm(request.POST, request.FILES)
-
-        if form.is_valid():
-            customer = form.save(commit=False)
-            if service_use_contract_form.is_valid():
-                contract = service_use_contract_form.save()
-                customer.service_use_contract = contract
-            customer.save()
-            return redirect('registration_success')
-        return render(
-            request,
-            self.template_name,
-            {
-                'form': form,
-                'service_use_contract_form': service_use_contract_form
-            }
-        )
 
 @method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
-class MemberRegistrationView(View):
-    template_name = 'account/member_registration.html'
+class MemberRegistrationListView(View):
+    template_name = 'account/member_registration_list.html'
 
     def get(self, request):
-        form = MemberRegistrationForm()
-        outsourcing_contract_form = OutsourcingAgreementUploadForm()
-        service_use_contract_form = ServiceUseAgreementUploadForm()
-        confidentiality_contract_form = ConfidentialityAgreementUploadForm()
-        return render(
-            request,
-            self.template_name,
-            {
-                'form': form,
-                'outsourcing_contract_form': outsourcing_contract_form,
-                'service_use_contract_form': service_use_contract_form,
-                'confidentiality_contract_form': confidentiality_contract_form
-            }
-        )
+        members = Member.objects.all()
+        return render(request, self.template_name, {'members': members})
 
-    def post(self, request):
-        form = MemberRegistrationForm(request.POST)
-        outsourcing_contract_form = OutsourcingAgreementUploadForm()
-        service_use_contract_form = ServiceUseAgreementUploadForm()
-        confidentiality_contract_form = ConfidentialityAgreementUploadForm()
-        if form.is_valid():
-            member = form.save(commit=False)
-            if service_use_contract_form.is_valid():
-                contract = service_use_contract_form.save()
-                member.service_use_contract = contract
-            if outsourcing_contract_form.is_valid():
-                contract = outsourcing_contract_form.save()
-                member.outsourcing_contract = contract
-            if confidentiality_contract_form.is_valid():
-                contract = confidentiality_contract_form.save()
-                member.confidentiality_contract = contract
-            member.save()
-            return redirect('registration_success')
-        return render(
-            request,
-            self.template_name,
-            {
-                'form': form,
-                'outsourcing_contract_form': outsourcing_contract_form,
-                'service_use_contract_form': service_use_contract_form,
-                'confidentiality_contract_form': confidentiality_contract_form
-            }
-        )
+
+@method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
+class MemberRegistrationDetailView(DetailView):
+    model = Member
+    template_name = 'account/member_registration.html'
+    form_class = MemberRegistrationDetailForm
+
+    def get_context_data(self, **kwargs):
+        # 既存の context データを取得
+        context = super().get_context_data(**kwargs)
+        # カスタムデータを追加
+        context['member'] = self.form_class(instance=self.object)  # 詳細表示用フォーム
+        # context['customer_types'] = CUSTOMER_TYPES
+        return context
 
 
 def registration_success(request):
@@ -224,7 +189,7 @@ class CustomerBankAccountCreateView(View):
         if form.is_valid():
             bank_account = form.save(commit=False)
             bank_account.save()
-            return redirect('bank_account_success')
+            return redirect('account:bank_account_success')
         return render(request, self.template_name, {'form': form})
 
 class CustomerBankAccountEditView(View):
@@ -240,7 +205,7 @@ class CustomerBankAccountEditView(View):
         if form.is_valid():
             bank_account = form.save(commit=False)
             bank_account.save()
-            return redirect('bank_account_success')
+            return redirect('account:bank_account_success')
         return render(request, self.template_name, {'form': form})
 
 
@@ -256,7 +221,7 @@ class MemberBankAccountCreateView(View):
         if form.is_valid():
             bank_account = form.save(commit=False)
             bank_account.save()
-            return redirect('bank_account_success')
+            return redirect('account:bank_account_success')
         return render(request, self.template_name, {'form': form})
 
 class MemberBankAccountEditView(View):
@@ -272,7 +237,7 @@ class MemberBankAccountEditView(View):
         if form.is_valid():
             bank_account = form.save(commit=False)
             bank_account.save()
-            return redirect('bank_account_success')
+            return redirect('account:bank_account_success')
         return render(request, self.template_name, {'form': form})
 
 
