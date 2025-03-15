@@ -19,10 +19,8 @@ urlpatterns = [
     # 本登録
     path('customer_registration_list/', views.CustomerRegistrationListView.as_view(), name='customer_registration_list'),
     path('customer_registration/edit/<int:pk>/', views.CustomerRegistrationDetailView.as_view(), name='customer_registration_detail'),
-    path('customer_registration/update/<int:pk>/', views.CustomerRegistrationUpdateView.as_view(), name='customer_registration_update'),
     path('member_registration_list/', views.MemberRegistrationListView.as_view(), name='member_registration_list'),
     path('member_registration/edit/<int:pk>/', views.MemberRegistrationDetailView.as_view(), name='member_registration_detail'),
-    path('member_registration/update/<int:pk>/', views.MemberRegistrationUpdateView.as_view(), name='member_registration_update'),
     path('registration_success/', views.registration_success, name='registration_success'),
     # パスワード変更
     path('password-change/', views.CustomPasswordChangeView.as_view(), name='password_change'),
