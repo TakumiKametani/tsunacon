@@ -142,4 +142,22 @@ $(document).ready(function() {
     });
 });
 
+$(document).ready(function() {
+		$('#id_bank_name').change(function() {
+				var bank_code = $(this).val();
+				$.ajax({
+						url: '{% url "account:get_branches" %}',
+						data: {
+								'bank_code': bank_code
+						},
+						success: function(data) {
+								var branch_select = $('#id_branch_name');
+								branch_select.empty();
+								$.each(data, function(key, value) {
+										branch_select.append('<option value="' + value[0] + '">' + value[1] + '</option>');
+								});
+						}
+				});
+		});
+});
 {% endblock %}
