@@ -2,6 +2,7 @@
 import random
 import string
 import uuid
+from datetime import datetime
 
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm
 from django import forms
@@ -105,6 +106,7 @@ class CustomerPreRegistrationForm(forms.ModelForm):
         model = Customer
         fields = [
             'customer_type',
+            'name',
             'last_name',
             'first_name',
             'last_name_kana',
@@ -187,11 +189,11 @@ class MemberPreRegistrationForm(forms.ModelForm):
 class CustomerRegistrationDetailForm(forms.ModelForm):
     last_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     first_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
-    bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名')
-    branch_name = forms.ChoiceField(label='支店名')
-    account_number = forms.CharField(max_length=20)
-    account_holder = forms.CharField(max_length=255)
-    service_use_contract_file = forms.FileField()
+    bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名', required=False)
+    branch_name = forms.ChoiceField(label='支店名', required=False)
+    account_number = forms.CharField(max_length=20, required=False)
+    account_holder = forms.CharField(max_length=255, required=False)
+    service_use_contract_file = forms.FileField(required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -210,6 +212,7 @@ class CustomerRegistrationDetailForm(forms.ModelForm):
         model = Customer
         fields = [
             'customer_type',
+            'name',
             'last_name',
             'first_name',
             'last_name_kana',
@@ -228,8 +231,6 @@ class CustomerRegistrationDetailForm(forms.ModelForm):
             'service_use_contract_file',
             'is_active',
             'is_terminated',
-            'last_modified',
-            'last_modifier',
         ]
 
     def save(self, commit=True):
@@ -237,7 +238,7 @@ class CustomerRegistrationDetailForm(forms.ModelForm):
         if commit:
             customer.save()
             CustomerBankAccount.objects.create(
-                user=customer.user,
+                customer=customer,
                 bank_name=self.cleaned_data['bank_name'],
                 branch_name=self.cleaned_data['branch_name'],
                 account_number=self.cleaned_data['account_number'],
@@ -298,8 +299,6 @@ class MemberRegistrationDetailForm(forms.ModelForm):
             'referral_id',
             'is_active',
             'is_terminated',
-            'last_modified',
-            'last_modifier',
         ]
 
     def save(self, commit=True):
@@ -308,7 +307,7 @@ class MemberRegistrationDetailForm(forms.ModelForm):
         if commit:
             member.save()
             MemberBankAccount.objects.create(
-                user=member.user,
+                member=member,
                 bank_name=self.cleaned_data['bank_name'],
                 branch_name=self.cleaned_data['branch_name'],
                 account_number=self.cleaned_data['account_number'],
@@ -335,84 +334,6 @@ class MemberRegistrationDetailForm(forms.ModelForm):
             if not Member.objects.filter(referral_id=referral_id).exists():
                 return referral_id
 
-
-class MemberRegistrationUpdateForm(forms.ModelForm):
-    last_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
-    first_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
-    bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名')
-    branch_name = forms.ChoiceField(label='支店名')
-    account_number = forms.CharField(max_length=20)
-    account_holder = forms.CharField(max_length=255)
-    service_use_contract_file = forms.FileField()
-    confidentiality_contract_file = forms.FileField()
-    outsourcing_contract_file = forms.FileField()
-    user_types = forms.ModelMultipleChoiceField(queryset=UserType.objects.all(), widget=forms.CheckboxSelectMultiple, required=False)
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'bank_name' in self.data:
-            self.fields['branch_name'].choices = get_branch_list(self.data['bank_name'])
-        elif self.instance.pk:
-            self.fields['branch_name'].choices = get_branch_list(self.instance.bank_name)
-        for field in self.fields.values():
-            field.widget.attrs['readonly'] = 'readonly'
-
-    class Meta:
-        model = Member
-        fields = [
-            'last_name',
-            'first_name',
-            'last_name_kana',
-            'first_name_kana',
-            'phone',
-            'postal_code',
-            'address_1',
-            'address_2',
-            'notification_email',
-            'user_types',
-            'referral_id',
-            'bank_name',
-            'branch_name',
-            'account_number',
-            'account_holder',
-            'service_use_contract_file',
-            'confidentiality_contract_file',
-            'outsourcing_contract_file',
-            'referral_id'
-        ]
-
-    def save(self, commit=True):
-        member = super().save(commit=False)
-        # OutsourcingAgreement, ConfidentialityAgreement, ServiceUseAgreement
-        if commit:
-            member.save()
-            MemberBankAccount.objects.create(
-                user=member.user,
-                bank_name=self.cleaned_data['bank_name'],
-                branch_name=self.cleaned_data['branch_name'],
-                account_number=self.cleaned_data['account_number'],
-                account_holder=self.cleaned_data['account_holder']
-            )
-            if self.cleaned_data['service_use_contract_file']:
-                ServiceUseAgreement.objects.create(
-                    contract_file=self.cleaned_data['service_use_contract_file']
-                )
-            if self.cleaned_data['confidentiality_contract_file']:
-                ConfidentialityAgreement.objects.create(
-                    contract_file=self.cleaned_data['confidentiality_contract_file']
-                )
-            if self.cleaned_data['outsourcing_contract_file']:
-                OutsourcingAgreement.objects.create(
-                    contract_file=self.cleaned_data['outsourcing_contract_file']
-                )
-
-        return member
-
-    def generate_unique_referral_id(self):
-        while True:
-            referral_id = ''.join(random.choices(string.ascii_uppercase + string.digits, k=10))
-            if not Member.objects.filter(referral_id=referral_id).exists():
-                return referral_id
 
 class OutsourcingAgreementUploadForm(forms.ModelForm):
     class Meta:

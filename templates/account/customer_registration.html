@@ -10,6 +10,10 @@
 						{{ customer.customer_type }}
 					</div>
 					<div>
+						<label for="id_name" class="block text-gray-700 mt-2">企業名</label>
+						{{ customer.name }}
+					</div>
+					<div>
 						<label for="id_last_name" class="block text-gray-700 mt-2">姓</label>
 						{{ customer.last_name }}
 					</div>
@@ -80,14 +84,6 @@
 					<div>
 						<label for="id_is_terminated" class="block text-gray-700 mt-2">退会済フラグ</label>
 						{{ customer.is_terminated }}
-					</div>
-					<div>
-						<label for="id_last_modified" class="block text-gray-700 mt-2">最終更新日</label>
-						{{ customer.last_modified }}
-					</div>
-					<div>
-						<label for="id_last_modifier" class="block text-gray-700 mt-2">最終更新者</label>
-						{{ customer.last_modifier }}
 					</div>
 					<button type="submit" id="save_button" class="bg-blue-500 text-white px-4 py-2 rounded" style="display:none">保存</button>
 				</form>

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.contrib.auth.views import LoginView, LogoutView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import TemplateView, DetailView, UpdateView
@@ -17,7 +19,7 @@ from .models import LoginStatus, CustomerBankAccount, MemberBankAccount
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
-from .forms import CustomerRegistrationDetailForm, CustomerRegistrationUpdateForm, MemberRegistrationDetailForm, MemberRegistrationUpdateForm, OutsourcingAgreementUploadForm, ServiceUseAgreementUploadForm, ConfidentialityAgreementUploadForm
+from .forms import CustomerRegistrationDetailForm, MemberRegistrationDetailForm, OutsourcingAgreementUploadForm, ServiceUseAgreementUploadForm, ConfidentialityAgreementUploadForm
 
 from utils.zengin_code_utils import get_branch_list
 from account.models import Customer, Member, CUSTOMER_TYPES
@@ -135,7 +137,7 @@ class CustomerRegistrationListView(View):
 
 
 @method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
-class CustomerRegistrationDetailView(DetailView):
+class CustomerRegistrationDetailView(UpdateView):
     model = Customer
     template_name = 'account/customer_registration.html'
     form_class = CustomerRegistrationDetailForm
@@ -148,6 +150,11 @@ class CustomerRegistrationDetailView(DetailView):
         context['customer_types'] = CUSTOMER_TYPES
         return context
 
+    def form_valid(self, form):
+        form.instance.last_modified = datetime.now()
+        form.instance.last_modifier = self.request.user
+        return super(CustomerRegistrationDetailView, self).form_valid(form)
+
 
 @method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
 class MemberRegistrationListView(View):
@@ -159,7 +166,7 @@ class MemberRegistrationListView(View):
 
 
 @method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
-class MemberRegistrationDetailView(DetailView):
+class MemberRegistrationDetailView(UpdateView):
     model = Member
     template_name = 'account/member_registration.html'
     form_class = MemberRegistrationDetailForm
@@ -171,6 +178,11 @@ class MemberRegistrationDetailView(DetailView):
         context['member'] = self.form_class(instance=self.object)  # 詳細表示用フォーム
         # context['customer_types'] = CUSTOMER_TYPES
         return context
+
+    def form_valid(self, form):
+        form.instance.last_modified = datetime.now()
+        form.instance.last_modifier = self.request.user
+        return super(MemberRegistrationDetailView, self).form_valid(form)
 
 
 def registration_success(request):
