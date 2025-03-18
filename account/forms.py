@@ -1,4 +1,4 @@
-
+import re
 import random
 import string
 import uuid
@@ -6,7 +6,7 @@ from datetime import datetime
 
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm, PasswordResetForm
 from django import forms
-from .models import Customer, CustomerBankAccount, MemberBankAccount, Member, OutsourcingAgreement, ConfidentialityAgreement, ServiceUseAgreement, UserType
+from .models import Customer, CustomerBankAccount, MemberBankAccount, Member, OutsourcingAgreement, ConfidentialityAgreement, ServiceUseAgreement, UserType, ACCOUNT_TYPES
 from utils.zengin_code_utils import get_bank_list, get_branch_list
 from utils.validators import validate_katakana
 from django.contrib.auth import authenticate
@@ -191,6 +191,7 @@ class CustomerRegistrationDetailForm(forms.ModelForm):
     first_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名', required=False)
     branch_name = forms.ChoiceField(label='支店名', required=False)
+    account_type = forms.fields.ChoiceField(choices=ACCOUNT_TYPES, widget=forms.widgets.Select)
     account_number = forms.CharField(max_length=20, required=False)
     account_holder = forms.CharField(max_length=255, required=False)
     service_use_contract_file = forms.FileField(required=False)
@@ -201,8 +202,22 @@ class CustomerRegistrationDetailForm(forms.ModelForm):
             self.fields['branch_name'].choices = get_branch_list(self.data['bank_name'])
         elif self.instance.pk:
             customer_bank = self.instance.customer_bank.filter(customer=self.instance).first()
-            bank_name = customer_bank.bank_name if customer_bank else '0001'
-            self.fields['branch_name'].choices = get_branch_list(bank_name)
+            bank_name, branch_name, account_type, account_number, account_holder = ['']*5
+            if customer_bank:
+                bank_name = re.sub(r'[\(\)\',]', '', customer_bank.bank_name)
+                branch_name = re.sub(r'[\(\)\',]', '', customer_bank.branch_name)
+                account_type = re.sub(r'[\(\)\',]', '', customer_bank.account_type)
+                account_number = re.sub(r'[\(\)\',]', '', customer_bank.account_number)
+                account_holder = customer_bank.account_holder
+            branch_list = get_branch_list(bank_name)
+            self.fields['branch_name'].choices = branch_list
+            # フィールドに初期値を設定
+            self.fields['bank_name'].initial = bank_name
+            self.fields['branch_name'].initial = branch_name
+            self.fields['account_type'].initial = account_type
+            self.fields['account_number'].initial = account_number
+            self.fields['account_holder'].initial = account_holder
+
         _class = 'block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40'
         for field in self.fields.values():
             field.widget.attrs['disabled'] = 'disabled'
@@ -226,6 +241,7 @@ class CustomerRegistrationDetailForm(forms.ModelForm):
             'payment_due_day',
             'bank_name',
             'branch_name',
+            'account_type',
             'account_number',
             'account_holder',
             'service_use_contract_file',
@@ -237,13 +253,13 @@ class CustomerRegistrationDetailForm(forms.ModelForm):
         customer = super().save(commit=False)
         if commit:
             customer.save()
-            CustomerBankAccount.objects.create(
-                customer=customer,
-                bank_name=self.cleaned_data['bank_name'],
-                branch_name=self.cleaned_data['branch_name'],
-                account_number=self.cleaned_data['account_number'],
-                account_holder=self.cleaned_data['account_holder']
-            )
+            bank, created = CustomerBankAccount.objects.get_or_create(customer=customer)
+            bank.bank_name = self.cleaned_data['bank_name'],
+            bank.branch_name = self.cleaned_data['branch_name'],
+            bank.account_type = self.cleaned_data['account_type'],
+            bank.account_number = self.cleaned_data['account_number'],
+            bank.account_holder = self.cleaned_data['account_holder']
+            bank.save()
             if self.cleaned_data['service_use_contract_file']:
                 ServiceUseAgreement.objects.create(
                     contract_file=self.cleaned_data['service_use_contract_file']
@@ -255,6 +271,7 @@ class MemberRegistrationDetailForm(forms.ModelForm):
     first_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名')
     branch_name = forms.ChoiceField(label='支店名')
+    account_type = forms.fields.ChoiceField(choices=ACCOUNT_TYPES, widget=forms.widgets.Select)
     account_number = forms.CharField(max_length=20)
     account_holder = forms.CharField(max_length=255)
     service_use_contract_file = forms.FileField()
@@ -270,6 +287,14 @@ class MemberRegistrationDetailForm(forms.ModelForm):
             member_bank = self.instance.member_bank.filter(customer=self.instance).first()
             bank_name = member_bank.bank_name if member_bank else '0001'
             self.fields['branch_name'].choices = get_branch_list(bank_name)
+            # 関連する CustomerBankAccount を取得
+            if member_bank:
+                # フィールドに初期値を設定
+                self.fields['bank_name'].initial = member_bank.bank_name
+                self.fields['branch_name'].initial = member_bank.branch_name
+                self.fields['account_type'].initial = member_bank.account_type
+                self.fields['account_number'].initial = member_bank.account_number
+                self.fields['account_holder'].initial = member_bank.account_holder
         _class = 'block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40'
         for field in self.fields.values():
             field.widget.attrs['disabled'] = 'disabled'
@@ -291,6 +316,7 @@ class MemberRegistrationDetailForm(forms.ModelForm):
             'referral_id',
             'bank_name',
             'branch_name',
+            'account_type',
             'account_number',
             'account_holder',
             'service_use_contract_file',

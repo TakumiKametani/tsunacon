@@ -12,7 +12,7 @@ from django.contrib.auth.views import (
     PasswordResetCompleteView
 )
 from . import forms
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.http.response import JsonResponse
 from .models import LoginStatus, CustomerBankAccount, MemberBankAccount
@@ -100,7 +100,7 @@ class CustomerPreRegistrationView(View):
         form = forms.CustomerPreRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('account:registration_success')
+            return redirect('account:registration_pre_success')
         return render(request, self.template_name, {'form': form})
 
 
@@ -115,7 +115,7 @@ class MemberPreRegistrationView(View):
         form = forms.MemberPreRegistrationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('account:registration_success')
+            return redirect('account:registration_pre_success')
         return render(request, self.template_name, {'form': form})
 
 
@@ -155,6 +155,9 @@ class CustomerRegistrationDetailView(UpdateView):
         form.instance.last_modifier = self.request.user
         return super(CustomerRegistrationDetailView, self).form_valid(form)
 
+    def get_success_url(self):
+        return reverse('account:registration_success')
+
 
 @method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
 class MemberRegistrationListView(View):
@@ -183,6 +186,9 @@ class MemberRegistrationDetailView(UpdateView):
         form.instance.last_modified = datetime.now()
         form.instance.last_modifier = self.request.user
         return super(MemberRegistrationDetailView, self).form_valid(form)
+
+    def get_success_url(self):
+        return reverse('account:registration_success')
 
 
 def registration_success(request):

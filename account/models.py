@@ -21,6 +21,11 @@ GENDER_TYPE = [
     ('o', '他')
 ]
 
+ACCOUNT_TYPES = [
+    ('savings', '普通'),
+    ('checking', '当座'),
+]
+
 
 def get_upload_to_contract(instance, filename):
     now = datetime.now()
@@ -143,6 +148,7 @@ class BankAccount(TimeStampedModel):
     branch_name = EncryptedCharField(max_length=255)
     account_number = EncryptedCharField(max_length=20)
     account_holder = EncryptedCharField(max_length=255)
+    account_type = models.CharField(max_length=20, choices=ACCOUNT_TYPES, default='savings')
 
     class Meta:
         abstract = True
@@ -153,8 +159,9 @@ class CustomerBankAccount(BankAccount):
     バーチャル口座番号を発行するので、顧客に支払いをしてもらう口座紐づきテーブル
     '''
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='customer_bank')
+
     def __str__(self):
-        return f"{self.customer} - {self.account_number}"
+        return f"{self.customer} - {self.account_number} ({self.get_account_type_display()})"
 
 
 class MemberBankAccount(BankAccount):
