@@ -34,6 +34,11 @@ class AdminLoginView(LoginView):
     form_class = forms.LoginForm
     template_name = "account/admin_login.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(self.get_success_url())
+        return super().dispatch(request, *args, **kwargs)
+
 
 class CustomerLoginView(LoginView):
     template_name = 'account/customer_login.html'
@@ -43,6 +48,11 @@ class CustomerLoginView(LoginView):
         # ログインタイプを判別して更新
         LoginStatus.objects.update_or_create(user=user, defaults={'is_customer': True, 'is_member': False})
         return redirect(self.get_success_url())
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(self.get_success_url())
+        return super().dispatch(request, *args, **kwargs)
 
 
 class MemberLoginView(LoginView):
@@ -54,13 +64,18 @@ class MemberLoginView(LoginView):
         LoginStatus.objects.update_or_create(user=user, defaults={'is_customer': False, 'is_member': True})
         return redirect(self.get_success_url())
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(self.get_success_url())
+        return super().dispatch(request, *args, **kwargs)
+
 
 class LoginChoiceView(TemplateView):
     template_name = "account/login_choice.html"
 
 class LogoutView(LoginRequiredMixin, LogoutView):
     """ログアウトページ"""
-    template_name = "account/admin_login.html"
+    template_name = "account/logout.html"
 
 
 class CustomPasswordChangeView(PasswordChangeView):
@@ -116,6 +131,8 @@ class MemberPreRegistrationView(View):
         if form.is_valid():
             form.save()
             return redirect('account:registration_pre_success')
+        else:
+            print(form.errors)
         return render(request, self.template_name, {'form': form})
 
 

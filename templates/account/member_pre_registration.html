@@ -8,60 +8,56 @@
             {% csrf_token %}
             {{ form.non_field_errors }}
 						<p>メモ：セレクトボックスよりも、radioボタンの方がいいかしら？？？</p>
-						<label for="user_type" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">登録希望タイプ</label>
-						<select name="user_type" id="user_type" class="block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40">
-								{% for value, label in form.user_type.field.choices %}
-										<option value="{{ value }}" {% if value == form.user_type.value %}selected{% endif %}>{{ label }}</option>
-								{% endfor %}
-						</select>
+						<label for="id_user_type" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">登録希望タイプ</label>
+						{{ form.user_type }}
             <div class="flex space-x-4">
 							<div class="flex-1">
-                <label for="last_name" class="block text-gray-700 mt-2">姓</label>
+                <label for="id_last_name" class="block text-gray-700 mt-2">姓</label>
                 {{ form.last_name }}
             	</div>
             	<div class="flex-1">
-              	  <label for="first_name" class="block text-gray-700 mt-2">名</label>
+              	  <label for="id_first_name" class="block text-gray-700 mt-2">名</label>
                 	{{ form.first_name }}
             	</div>
 						</div>
             <div class="flex space-x-4">
                 <div class="flex-1">
-                    <label for="last_name_kana" class="block text-gray-700 mt-2">姓(カナ)</label>
-                    <input type="text" id="last_name_kana" name="last_name_kana" x-model="lastNameKana" @input="validateKatakana" class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring focus:ring-blue-400 focus:outline-none focus:ring-opacity-40">
+                    <label for="id_last_name_kana" class="block text-gray-700 mt-2">姓(カナ)</label>
+                    <input type="text" id="id_last_name_kana" name="last_name_kana" x-model="lastNameKana" @input="validateKatakana" class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring focus:ring-blue-400 focus:outline-none focus:ring-opacity-40">
                     <p x-show="!isLastNameKanaValid" class="text-red-500">このフィールドはカタカナのみを含む必要があります。</p>
                 </div>
                 <div class="flex-1">
-                    <label for="first_name_kana" class="block text-gray-700 mt-2">名(カナ)</label>
-                    <input type="text" id="first_name_kana" name="first_name_kana" x-model="firstNameKana" @input="validateKatakana" class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring focus:ring-blue-400 focus:outline-none focus:ring-opacity-40">
+                    <label for="id_first_name_kana" class="block text-gray-700 mt-2">名(カナ)</label>
+                    <input type="text" id="id_first_name_kana" name="first_name_kana" x-model="firstNameKana" @input="validateKatakana" class="block w-full px-5 py-3 mt-2 text-gray-700 bg-white border border-gray-200 rounded-md focus:border-blue-400 focus:ring focus:ring-blue-400 focus:outline-none focus:ring-opacity-40">
                     <p x-show="!isFirstNameKanaValid" class="text-red-500">このフィールドはカタカナのみを含む必要があります。</p>
                 </div>
             </div>
             <div>
-                <label for="email" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">メールアドレス</label>
+                <label for="id_email" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">メールアドレス</label>
                 {{ form.email }}
             </div>
             <div>
-                <label for="phone" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">電話番号</label>
+                <label for="id_phone" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">電話番号</label>
                 {{ form.phone }}
             </div>
             <div>
-                <label for="postal_code" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">郵便番号</label>
+                <label for="id_postal_code" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">郵便番号</label>
                 {{ form.postal_code }}
             </div>
             <div>
-							<label for="address_1" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">住所</label>
+							<label for="id_address_1" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">住所</label>
 							{{ form.address_1 }}
             </div>
             <div>
-							<label for="address_2" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">ビル・建物名〇階</label>
+							<label for="id_address_2" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">ビル・建物名〇階</label>
 							{{ form.address_2 }}
             </div>
             <div>
-							<label for="terms_accepted" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">利用規約を読了しました</label>
+							<label for="id_terms_accepted" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">利用規約を読了しました</label>
 							{{ form.terms_accepted }}
             </div>
             <div>
-							<label for="privacy_policy_accepted" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">プライバシーポリシーを読了しました</label>
+							<label for="id_privacy_policy_accepted" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">プライバシーポリシーを読了しました</label>
 							{{ form.privacy_policy_accepted }}
             </div>
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded mt-4" :disabled="!isFormValid">Register</button>
@@ -94,13 +90,13 @@
                 validateKatakana(event) {
                     const katakanaRegex = /^[\u30A0-\u30FF]+$/;
                     const fieldName = event.target.id;
-                    if (fieldName === 'first_name_kana') {
+                    if (fieldName === 'id_first_name_kana') {
                     	if( this.firstNameKana.length < 1){
                     		this.isFirstNameKanaValid = true;
                     	}else{
                         this.isFirstNameKanaValid = katakanaRegex.test(this.firstNameKana);
 											}
-                    } else if (fieldName === 'last_name_kana') {
+                    } else if (fieldName === 'id_last_name_kana') {
 											if( this.lastNameKana.length < 1){
 													this.isLastNameKanaValid = true;
 											}else{

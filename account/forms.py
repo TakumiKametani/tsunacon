@@ -135,14 +135,16 @@ class CustomerPreRegistrationForm(forms.ModelForm):
         return instance
 
 
+from django.core.exceptions import ValidationError
+
 class MemberPreRegistrationForm(forms.ModelForm):
-    USER_TYPE_CHOICES = [
-        ('tsunacon', 'つなコン'),
-        ('tsunasp', 'つなスパ'),
-        ('tsunamen', 'つなメン'),
-    ]
-    user_type = forms.ChoiceField(label='登録タイプ', required=True, choices=USER_TYPE_CHOICES, widget=forms.widgets.Select)
-    email = forms.EmailField(label='User Email', required=True)
+    user_type = forms.ModelChoiceField(
+        label='登録タイプ',
+        required=True,
+        queryset=UserType.objects.all(),
+        widget=forms.widgets.Select
+    )
+    email = forms.EmailField(label='メールアドレス', required=True)
     last_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     first_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     terms_accepted = forms.BooleanField(label='利用規約を読了しました', required=True)
@@ -153,6 +155,25 @@ class MemberPreRegistrationForm(forms.ModelForm):
         _class = 'block w-full px-5 py-3 mt-2 text-gray-700 placeholder-gray-400 bg-white border border-gray-200 rounded-md dark:placeholder-gray-600 dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 focus:border-blue-400 dark:focus:border-blue-400 focus:ring-blue-400 focus:outline-none focus:ring focus:ring-opacity-40'
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = _class
+
+    # def clean_user_type(self):
+    #     user_type_str = self.cleaned_data['user_type']
+    #     user_type = UserType.objects.filter(type_id=user_type_str).first()
+    #     if not user_type:
+    #         raise forms.ValidationError("無効な登録タイプです。")
+    #     return user_type
+
+    def clean(self):
+        cleaned_data = super().clean()
+        user_type = cleaned_data.get('user_type')
+        email = cleaned_data.get('email')
+
+        # CustomUserのチェック
+        user = CustomUser.objects.filter(email=email).first()
+        if user and Member.objects.filter(user_type=user_type, user=user).exists():
+            raise ValidationError("このユーザータイプとユーザーの組み合わせはすでに登録されています。")
+
+        return cleaned_data
 
     class Meta:
         model = Member
@@ -176,6 +197,7 @@ class MemberPreRegistrationForm(forms.ModelForm):
         if commit:
             user = CustomUser.objects.create_user(
                 email=self.cleaned_data['email'],
+                username=uuid.uuid4().hex[:10],
             )
             instance.user = user
             instance.terms_accepted = self.cleaned_data['terms_accepted']
@@ -183,6 +205,7 @@ class MemberPreRegistrationForm(forms.ModelForm):
             instance.user.save()
             instance.save()
         return instance
+
 
 
 
@@ -307,6 +330,7 @@ class MemberRegistrationDetailForm(forms.ModelForm):
             'first_name',
             'last_name_kana',
             'first_name_kana',
+            # 'gender',
             'phone',
             'postal_code',
             'address_1',

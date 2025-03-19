@@ -1,0 +1,10 @@
+{% extends 'login_base.html' %}
+{% block content %}
+    <div class="min-h-screen flex items-center justify-center">
+        <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg px-8 py-6 max-w-md text-center">
+            <h1 class="text-2xl font-bold text-center mb-4 text-gray-900 dark:text-gray-100">ログアウト</h1>
+            <p class="text-gray-700 dark:text-gray-300 mb-4">遷移しない場合、下記のボタンで繊維をしてください</p>
+            <a href="{% url 'account:top' %}" class="text-indigo-500 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">トップページへ戻る</a>
+        </div>
+    </div>
+{% endblock %}

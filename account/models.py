@@ -92,7 +92,7 @@ class UserBaseModel(models.Model):
 
 
 class UserType(TimeStampedModel):
-    type_id = models.PositiveSmallIntegerField(unique=True)
+    type_id = models.CharField(unique=True, max_length=10)
     name = models.CharField(max_length=50)
 
     def __str__(self):
@@ -100,7 +100,7 @@ class UserType(TimeStampedModel):
 
 
 class Member(UserBaseModel, TimeStampedModel):
-    user_types = models.ManyToManyField(UserType, related_name='members')
+    user_type = models.OneToOneField(UserType, related_name='members', on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='member_profiles')
     referral_id = models.CharField(max_length=100)
     last_modifier = models.ForeignKey(CustomUser, null=True, blank=True, on_delete=models.SET_NULL, related_name='member_last_modifier')
@@ -109,7 +109,12 @@ class Member(UserBaseModel, TimeStampedModel):
     is_terminated = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.user_types} - {self.last_name} {self.first_name}({self.last_name_kana} {self.first_name_kana}) - {self.referral_id}"
+        return f"{self.user_type} - {self.last_name} {self.first_name}({self.last_name_kana} {self.first_name_kana}) - {self.referral_id}"
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['user_type', 'user'], name='unique_user_type_user')
+        ]
 
 
 class MemberProfile(TimeStampedModel):
