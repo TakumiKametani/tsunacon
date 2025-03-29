@@ -1,3 +1,4 @@
+import uuid
 from datetime import datetime
 
 from django.db import models
@@ -99,6 +100,20 @@ class UserType(TimeStampedModel):
         return self.name
 
 
+class MemberManager(models.Manager):
+    def active(self):
+        return self.filter(is_active=True)
+
+    def check_referral_id(self, referral_id):
+        return self.filter(referral_id=referral_id).exists()
+
+    def create_referral_id(self):
+        referral_id = uuid.uuid4().hex[:5]
+        if self.check_referral_id(referral_id):
+            self.create_referral_id()
+        return referral_id
+
+
 class Member(UserBaseModel, TimeStampedModel):
     user_type = models.OneToOneField(UserType, related_name='members', on_delete=models.CASCADE)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='member_profiles')
@@ -107,6 +122,8 @@ class Member(UserBaseModel, TimeStampedModel):
     last_modified = models.DateField(null=True, blank=True)
     is_active = models.BooleanField(default=False)
     is_terminated = models.BooleanField(default=False)
+
+    objects = MemberManager()
 
     def __str__(self):
         return f"{self.user_type} - {self.last_name} {self.first_name}({self.last_name_kana} {self.first_name_kana}) - {self.referral_id}"
@@ -120,10 +137,11 @@ class Member(UserBaseModel, TimeStampedModel):
 class MemberProfile(TimeStampedModel):
     member = models.ForeignKey(Member, related_name='member', on_delete=models.CASCADE)
     gender = models.CharField(max_length=2, choices=GENDER_TYPE)
-    age = models.PositiveSmallIntegerField(null=True, blank=True)
+    birth = models.DateField(null=True, blank=True)
     description = models.TextField(null=True, blank=True, help_text='簡易的な経歴等の記載', verbose_name='自己PR')
     port_folio = models.URLField(null=True, blank=True)
     resume = models.FileField(upload_to=get_upload_to_resume, null=True, blank=True)  # 動的パス
+    
 
 class Customer(UserBaseModel, TimeStampedModel):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='customer_profiles')

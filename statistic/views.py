@@ -2,7 +2,13 @@ from django.views.generic import ListView
 from dashboard.models import Project
 from django.db.models import Min, Max
 
-class ProjectStatisticsView(ListView):
+from utils.helper import with_login_status
+from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
+
+
+@method_decorator(with_login_status, name='dispatch')
+class ProjectStatisticsView(ListView, LoginRequiredMixin):
     model = Project
     template_name = 'statistics/statistics.html'
     context_object_name = 'projects'

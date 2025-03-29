@@ -9,7 +9,12 @@ import boto3
 from django.conf import settings
 import os
 
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required, user_passes_test
+from utils.helper import is_admin
 
+
+@method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
 class InvoiceCreateView(CreateView):
     model = Invoice
     form_class = InvoiceForm

@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% block title %}プロフィール{% endblock %}
+{% block content %}
+    <div class="container mx-auto p-4">
+			<h1 class="text-2xl font-bold">プロフィール</h1>
+			<form method="post">
+				{% csrf_token %}
+				<div>
+					<label for="id_last_name" class="block text-gray-700 mt-2">姓</label>
+					{{ member.last_name }}
+				</div>
+				<div>
+					<label for="id_first_name" class="block text-gray-700 mt-2">名</label>
+					{{ member.first_name }}
+				</div>
+				<div>
+					<label for="id_last_name_kana" class="block text-gray-700 mt-2">姓（カナ）</label>
+					{{ member.last_name_kana }}
+				</div>
+				<div>
+					<label for="id_first_name_kana" class="block text-gray-700 mt-2">名（カナ）</label>
+					{{ member.first_name_kana }}
+				</div>
+				<div>
+					<label for="id_phone" class="block text-gray-700 mt-2">電話番号</label>
+				{{ member.phone }}
+				</div>
+				<div>
+					<label for="id_postal_code" class="block text-gray-700 mt-2">郵便番号</label>
+					{{ member.postal_code }}
+				</div>
+				<div>
+					<label for="id_address_1" class="block text-gray-700 mt-2">住所</label>
+					{{ member.address_1 }}
+				</div>
+				<div>
+					<label for="id_address_2" class="block text-gray-700 mt-2">建物/部屋番号</label>
+					{{ member.address_2 }}
+				</div>
+				<div>
+					<label for="id_notification_email" class="block text-gray-700 mt-2">メールアドレス（通知）</label>
+					{{ member.notification_email }}
+				</div>
+				<div>
+					<label for="id_gender" class="block text-gray-700 mt-2">性別</label>
+					{{ member.gender }}
+				</div>
+				<div>
+					<label for="id_birth" class="block text-gray-700 mt-2">誕生日</label>
+					{{ member.birth }}
+				</div>
+				<div>
+					<label for="id_description" class="block text-gray-700 mt-2">簡易経歴書</label>
+					{{ member.description }}
+				</div>
+				<div>
+					<label for="id_port_folio" class="block text-gray-700 mt-2">ポートフォリオURL</label>
+					{{ member.port_folio }}
+				</div>
+				<div>
+					<label for="id_resume" class="block text-gray-700 mt-2">経歴書</label>
+					{{ member.resume }}
+				</div>
+				<button type="submit" id="save_button" class="bg-blue-500 text-white px-4 py-2 rounded" style="display:none">保存</button>
+			</form>
+		</div>
+{% endblock %}

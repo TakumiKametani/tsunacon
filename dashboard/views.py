@@ -6,17 +6,21 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Project, ChatMessage, Grade
 from .forms import ProjectForm, ChatMessageForm
 from django.http import JsonResponse
+from utils.helper import update_login_status,with_login_status
+from django.utils.decorators import method_decorator
 
-# class ProjectListView(View, LoginRequiredMixin):
-class ProjectListView(View):
+
+@method_decorator(with_login_status, name='dispatch')
+class ProjectListView(View, LoginRequiredMixin):
     template_name = 'dashboard/project_list.html'
 
     def get(self, request):
         projects = Project.objects.all()
         return render(request, self.template_name, {'projects': projects})
 
-# class ProjectDetailView(DetailView, LoginRequiredMixin):
-class ProjectDetailView(DetailView):
+
+@method_decorator(with_login_status, name='dispatch')
+class ProjectDetailView(DetailView, LoginRequiredMixin):
     model = Project
     template_name = 'dashboard/project_detail.html'
 
@@ -27,6 +31,7 @@ class ProjectDetailView(DetailView):
         return context
 
 
+@method_decorator(with_login_status, name='dispatch')
 class ProjectUpdateView(UpdateView, LoginRequiredMixin):
     model = Project
     form_class = ProjectForm
@@ -34,6 +39,7 @@ class ProjectUpdateView(UpdateView, LoginRequiredMixin):
     success_url = reverse_lazy('project_list')
 
 
+@method_decorator(with_login_status, name='dispatch')
 class ProjectCreateView(CreateView, LoginRequiredMixin):
     model = Project
     form_class = ProjectForm
@@ -41,6 +47,7 @@ class ProjectCreateView(CreateView, LoginRequiredMixin):
     success_url = reverse_lazy('project_list')
 
 
+@method_decorator(with_login_status, name='dispatch')
 class ChatMessageCreateView(View, LoginRequiredMixin):
     def post(self, request, *args, **kwargs):
         form = ChatMessageForm(request.POST)
@@ -53,6 +60,8 @@ class ChatMessageCreateView(View, LoginRequiredMixin):
             return JsonResponse({'status': 'success', 'message': 'Chat message created successfully'})
         return JsonResponse({'status': 'error', 'errors': form.errors})
 
+
+@method_decorator(with_login_status, name='dispatch')
 class ChatMessageUpdateView(View, LoginRequiredMixin):
     def post(self, request, *args, **kwargs):
         chat_message = get_object_or_404(ChatMessage, pk=kwargs.get('pk'))
@@ -64,6 +73,8 @@ class ChatMessageUpdateView(View, LoginRequiredMixin):
             return JsonResponse({'status': 'success', 'message': 'Chat message updated successfully'})
         return JsonResponse({'status': 'error', 'errors': form.errors})
 
+
+@method_decorator(with_login_status, name='dispatch')
 class ChatMessageDeleteView(View, LoginRequiredMixin):
     def post(self, request, *args, **kwargs):
         chat_message = get_object_or_404(ChatMessage, pk=kwargs.get('pk'))

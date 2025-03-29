@@ -7,8 +7,13 @@ from django.core.mail import send_mail
 
 from dashboard.forms import ProjectForm
 from dashboard.models import Project
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.utils.decorators import method_decorator
+from utils.helper import update_login_status, with_login_status
 
-class DepartmentCreateView(View):
+
+@method_decorator(with_login_status, name='dispatch')
+class DepartmentCreateView(View, LoginRequiredMixin):
     template_name = 'departments/department_form.html'
 
     def get(self, request):
@@ -24,7 +29,9 @@ class DepartmentCreateView(View):
         customers = Customer.objects.filter(customer_type__in=['company', 'organization', 'group'])
         return render(request, self.template_name, {'form': form, 'customers': customers})
 
-class ContactPersonCreateView(View):
+
+@method_decorator(with_login_status, name='dispatch')
+class ContactPersonCreateView(View, LoginRequiredMixin):
     template_name = 'departments/contact_person_form.html'
 
     def get(self, request):
@@ -54,7 +61,8 @@ def contact_person_success(request):
     return render(request, 'departments/success.html', {'message': 'Contact person created successfully'})
 
 
-class ProjectCreateView(View):
+@method_decorator(with_login_status, name='dispatch')
+class ProjectCreateView(View, LoginRequiredMixin):
     template_name = 'departments/project_form.html'
 
     def get(self, request):

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'login_base.html' %}
 {% block title %}ご利用仮登録{% endblock %}
 {% block content %}
 	<!-- lg:max-w-xl  min-h-screen flex items-center justify-center w-full dark:bg-gray-950-->
@@ -52,6 +52,10 @@
             <div>
                 <label for="id_address_2" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">ビル・建物名〇階</label>
                 {{ form.address_2 }}
+            </div>
+						<div>
+                <label for="id_referral_id" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">ご紹介ID</label>
+                {{ form.referral_id }}
             </div>
 						<div>
 							<label for="id_terms_accepted" class="block mb-2 text-sm text-gray-600 dark:text-gray-200">利用規約を読了しました</label>

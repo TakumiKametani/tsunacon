@@ -118,7 +118,7 @@
         <tr>
           <th scope="col" onclick="sortTable(0)">会員名</th>
           <th scope="col" onclick="sortTable(1)">会員ユーザ名</th>
-          <th scope="col" onclick="sortTable(2)">サービス開始日</th>
+          <th scope="col" onclick="sortTable(2)">タイプ</th>
           <th scope="col" onclick="sortTable(3)">最終更新者</th>
           <th scope="col" onclick="sortTable(4)">アクティブ</th>
         </tr>
@@ -126,9 +126,9 @@
       <tbody>
 				{% for member in members %}
 					<tr>
-						<td><a href="{% url 'account:member_registration_detail' pk=member.id %}">{{ member.name }}</a></td>
+						<td><a href="{% url 'account:member_registration_detail' pk=member.id %}">{{ member.last_name }} {{ member.first_name }}</a></td>
 						<td>{{ member.user.username }}</td>
-						<td>{{ member.user_types }}</td>
+						<td>{{ member.user_type.name }}</td>
 						<td>{{ member.last_modifier }}</td>
 						<td>
 							{% if member.is_active %}

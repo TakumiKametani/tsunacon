@@ -4,8 +4,15 @@ from .forms import PaymentForm, CustomerPaymentStatusForm, MemberSalesPaymentSta
 from .models import Payment, SalesPayment
 from django.db.models import Sum
 from ticket.models import TicketTransaction
+from utils.helper import with_login_status
+from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.decorators import login_required, user_passes_test
+from utils.helper import is_admin
 
-class PaymentListView(View):
+
+@method_decorator(with_login_status, name='dispatch')
+class PaymentListView(View, LoginRequiredMixin):
     template_name = 'payments/payment_list.html'
 
     def get(self, request):
@@ -52,8 +59,8 @@ class PaymentListView(View):
         })
 
 
-
-class PaymentDetailView(View):
+@method_decorator(with_login_status, name='dispatch')
+class PaymentDetailView(View, LoginRequiredMixin):
     template_name = 'payments/payment_detail.html'
 
     def get(self, request, year, month):
@@ -65,7 +72,8 @@ class PaymentDetailView(View):
         return render(request, self.template_name, {'payments': payments, 'received_tickets': received_tickets, 'given_tickets': given_tickets})
 
 
-class SalesPaymentListView(View):
+@method_decorator(with_login_status, name='dispatch')
+class SalesPaymentListView(View, LoginRequiredMixin):
     template_name = 'payments/sales_payment_list.html'
 
     def get(self, request):
@@ -77,7 +85,8 @@ class SalesPaymentListView(View):
         return render(request, self.template_name, {'payments': payments, 'monthly_totals': monthly_totals})
 
 
-class SalesPaymentDetailView(View):
+@method_decorator(with_login_status, name='dispatch')
+class SalesPaymentDetailView(View, LoginRequiredMixin):
     template_name = 'payments/sales_payment_detail.html'
 
     def get(self, request, project_id):
@@ -85,6 +94,7 @@ class SalesPaymentDetailView(View):
         return render(request, self.template_name, {'payments': payments})
 
 
+@method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
 class CustomerPaymentStatusCreateView(View):
     template_name = 'accounts/customer_payment_status_form.html'
 
@@ -100,6 +110,8 @@ class CustomerPaymentStatusCreateView(View):
             return redirect('customer_payment_status_success')
         return render(request, self.template_name, {'form': form})
 
+
+@method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
 class MemberSalesPaymentStatusCreateView(View):
     template_name = 'accounts/member_sales_payment_status_form.html'
 

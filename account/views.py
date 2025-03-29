@@ -19,10 +19,14 @@ from .models import LoginStatus, CustomerBankAccount, MemberBankAccount
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
-from .forms import CustomerRegistrationDetailForm, MemberRegistrationDetailForm, OutsourcingAgreementUploadForm, ServiceUseAgreementUploadForm, ConfidentialityAgreementUploadForm
+from .forms import CustomerRegistrationDetailForm, MemberRegistrationDetailForm, MemberSelfRegistrationDetailForm, OutsourcingAgreementUploadForm, ServiceUseAgreementUploadForm, ConfidentialityAgreementUploadForm
 
 from utils.zengin_code_utils import get_branch_list
 from account.models import Customer, Member, CUSTOMER_TYPES
+from utils.decorator import is_self_user
+from django.contrib import messages
+from django.utils.http import url_has_allowed_host_and_scheme
+from utils.helper import update_login_status, with_login_status, is_admin
 
 
 class TopView(TemplateView):
@@ -41,12 +45,13 @@ class AdminLoginView(LoginView):
 
 
 class CustomerLoginView(LoginView):
+    form_class = forms.LoginForm
     template_name = 'account/customer_login.html'
 
     def form_valid(self, form):
         user = form.get_user()
         # ログインタイプを判別して更新
-        LoginStatus.objects.update_or_create(user=user, defaults={'is_customer': True, 'is_member': False})
+        update_login_status(user, is_customer=True, is_member=False)
         return redirect(self.get_success_url())
 
     def dispatch(self, request, *args, **kwargs):
@@ -56,12 +61,13 @@ class CustomerLoginView(LoginView):
 
 
 class MemberLoginView(LoginView):
+    form_class = forms.LoginForm
     template_name = 'account/member_login.html'
 
     def form_valid(self, form):
         user = form.get_user()
         # ログインタイプを判別して更新
-        LoginStatus.objects.update_or_create(user=user, defaults={'is_customer': False, 'is_member': True})
+        update_login_status(user, is_customer=False, is_member=True)
         return redirect(self.get_success_url())
 
     def dispatch(self, request, *args, **kwargs):
@@ -140,10 +146,6 @@ def registration_pre_success(request):
     return render(request, 'account/registration_pre_success.html')
 
 
-def is_admin(user):
-    return user.is_superuser
-
-
 @method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
 class CustomerRegistrationListView(View):
     template_name = 'account/customer_registration_list.html'
@@ -206,6 +208,37 @@ class MemberRegistrationDetailView(UpdateView):
 
     def get_success_url(self):
         return reverse('account:registration_success')
+
+
+@method_decorator([login_required, is_self_user, with_login_status], name='dispatch')
+class MemberSelfRegistrationDetailView(UpdateView):
+    model = Member
+    template_name = 'account/member_self_registration.html'
+    form_class = MemberSelfRegistrationDetailForm
+
+    def get_context_data(self, **kwargs):
+        # 既存の context データを取得
+        context = super().get_context_data(**kwargs)
+        # カスタムデータを追加
+        context['member'] = self.form_class(instance=self.object)  # 詳細表示用フォーム
+        # context['customer_types'] = CUSTOMER_TYPES
+        return context
+
+    def form_valid(self, form):
+        form.instance.last_modified = datetime.now()
+        form.instance.last_modifier = self.request.user
+        messages.success(self.request, "更新が完了しました！")
+        return super(MemberSelfRegistrationDetailView, self).form_valid(form)
+
+    def get_success_url(self):
+        # Referer（遷移元 URL）を取得
+        referer_url = self.request.META.get('HTTP_REFERER')
+        if referer_url and url_has_allowed_host_and_scheme(url=referer_url, allowed_hosts={self.request.get_host()}):
+            return referer_url
+        return reverse('account:registration_success')
+
+
+
 
 
 def registration_success(request):

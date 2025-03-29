@@ -10,13 +10,13 @@
           <ul class="nav col-12 col-lg-auto my-2 justify-content-center my-md-0 text-small">
 						{% if request.user.is_authenticated and request.user.is_superuser %}
             <li>
-              <a href="{% url 'account:customer_registration_list' %}" class="nav-link {% if 'info' in request.path %}text-secondary{% else %}text-white{% endif %}">
+              <a href="{% url 'account:customer_registration_list' %}" class="nav-link {% if 'customer_registration' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/info.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
                 顧客本登録
               </a>
             </li>
 						<li>
-              <a href="{% url 'account:member_registration_list' %}" class="nav-link {% if 'info' in request.path %}text-secondary{% else %}text-white{% endif %}">
+              <a href="{% url 'account:member_registration_list' %}" class="nav-link {% if 'member_registration' in request.path %}text-secondary{% else %}text-white{% endif %}">
                 <img src="{% static 'image/icon/info.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
                 会員本登録
               </a>
@@ -55,7 +55,11 @@
               </a>
             </li>
             <li>
-              <a href="#" class="nav-link {% if 'profile' in request.path %}text-secondary{% else %}text-white{% endif %}">
+							{% if request.login_status.is_member %}
+							<a href="{% url 'account:member_self_registration' request.user.pk %}" class="nav-link {% if 'profile' in request.path %}text-secondary{% else %}text-white{% endif %}">
+							{% else %}
+							<a href="#" class="nav-link {% if 'profile' in request.path %}text-secondary{% else %}text-white{% endif %}">
+							{% endif %}
                 {{ request.user.username }}
               </a>
             </li>

@@ -1,8 +1,8 @@
 {% extends 'login_base.html' %}
-{% block title %}管理者ログイン{% endblock %}
+{% block title %}会員ログイン{% endblock %}
 {% block content %}
 <main class="form-signin w-100 m-auto">
-    <form method="post" action="{% url 'account:admin_login' %}">
+    <form method="post" action="{% url 'account:member_login' %}">
         {% csrf_token %}
         <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
 

@@ -8,8 +8,8 @@ from .models import Announcement, UserAnnouncement
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, redirect
 
-# TODO STUB
-from .tests.stub import StubLoginStatus
+from utils.helper import update_login_status, with_login_status, get_login_status_cache
+from django.utils.decorators import method_decorator
 
 
 class AnnouncementListView(generic.ListView):
@@ -27,9 +27,7 @@ class AnnouncementListView(generic.ListView):
                                                         target_audience__in=audience).order_by('-created')
         else:
             audience += ['membership']
-            # login_status = LoginStatus.objects.get(user=user)
-            # TODO STUB
-            login_status = StubLoginStatus()
+            login_status = get_login_status_cache(user=user)
             read_announcements = UserAnnouncement.objects.filter(user=user).values_list('announcement', flat=True)
             if login_status.is_customer:
                 # 顧客向けのフィルタリング
