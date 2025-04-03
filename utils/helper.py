@@ -1,7 +1,4 @@
 from account.models import LoginStatus
-from django.contrib.auth.signals import user_logged_out
-from django.dispatch import receiver
-from django.conf import settings
 
 from functools import wraps
 from django.http import Http404
@@ -23,7 +20,6 @@ def update_login_status(user, is_customer, is_member):
 
 
 def get_login_status_cache(user):
-    # キャッシュキーを生成
     login_status = LoginStatus.objects.filter(
         user=user,
     ).first()
