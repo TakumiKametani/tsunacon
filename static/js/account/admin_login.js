@@ -1,13 +1,13 @@
-import { emailValidationCheck } from "../validation.js";
+import { loginValidationCheck } from "../validation.js";
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // 管理者ログイン画面のemailのバリデーションチェック
+    // 管理者ログイン画面のバリデーションチェック
     const emailInput = document.getElementById("floatingInput");
-    const passwordInput = document.getElementById("adminSignInButton");
+    const passwordInput = document.getElementById("floatingPassword");
     const adminSignInButton = document.getElementById("adminSignInButton");
 
-    emailValidationCheck(emailInput,passwordInput,adminSignInButton);
+    loginValidationCheck(emailInput,passwordInput,adminSignInButton);
 
 
 });

@@ -1,7 +1,7 @@
 import validator from 'https://cdn.jsdelivr.net/npm/validator@latest/+esm';
 
-// emailのバリデーションチェック
-export function emailValidationCheck(emailInput,passwordInput,adminSignInButton) {
+// emailとpasswordの入力が必要なバリデーションチェック
+export function loginValidationCheck(emailInput,passwordInput,adminSignInButton) {
 
     // emailの入力チェック
     emailInput.addEventListener("input", function () {
@@ -24,6 +24,13 @@ export function emailValidationCheck(emailInput,passwordInput,adminSignInButton)
 
     // passwordの入力チェック
     passwordInput.addEventListener("input", function () {
+        let passwordValue = passwordInput.value;
+        let emailValue = emailInput.value;
+        if(!validator.isEmpty(passwordValue)){
+            passwordInput.classList.remove("is-invalid");
+        }else{
+            passwordInput.classList.add("is-invalid");
+        }
 
         if (validator.isEmail(emailValue) && validator.isEmpty(passwordValue)) {
             adminSignInButton.disabled = false;

@@ -15,7 +15,7 @@
         <div class="form-floating mb-3">
             {{ form.email }}
             <label for="{{ form.email.id_for_label }}">Email address</label>
-            <div id="emailError" class="invalid-feedback">※ 正しいメールアドレスを入力してください</div>
+            <div id="emailError" class="invalid-feedback">正しいメールアドレスを入力してください</div>
             {% if form.email.errors %}
                 <div class="text-danger">
                     {{ form.email.errors }}
@@ -25,6 +25,7 @@
         <div class="form-floating mb-3">
             {{ form.password }}
             <label for="{{ form.password.id_for_label }}">Password</label>
+            <div id="passwordError" class="invalid-feedback">パスワードは必須入力です</div>
             {% if form.password.errors %}
                 <div class="text-danger">
                     {{ form.password.errors }}
