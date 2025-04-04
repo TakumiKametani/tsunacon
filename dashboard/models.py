@@ -24,27 +24,40 @@ STATUS = [
 ]
 
 
-class Grade(TimeStampedModel):
-    """
-    つなスパの時給を登録していく。そこから自動計算。
-    Grade-1 1000
-    Grade-2 1200
-    Grade-3 1500
-    Grade-4 1800
-    Grade-5 2000
-    Grade-6 2500
-    Grade-7 3000
-    Grade-8 3500
-    Grade-9 4000
-    """
+class TagManager(models.Manager):
+    pass
+
+
+class Tag(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
+    objects = TagManager()
+
+
+class CategoryManager(models.Manager):
+    pass
+
+
+class Category(TimeStampedModel):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    tags = models.ManyToManyField(Tag, related_name="categories")
+
+    objects = CategoryManager()
+
+
+class ProjectManager(models.Manager):
+    pass
+
+
 class Project(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    grade = models.ForeignKey(Grade, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
+    tags = models.ManyToManyField(Tag)
+    grade = models.PositiveSmallIntegerField(max_length=10, null=True, blank=True)
     estimated_hours = models.IntegerField(help_text="見込時間（時間単位）")
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
     client_name = models.CharField(max_length=255)
@@ -57,14 +70,26 @@ class Project(TimeStampedModel):
     tuna_spa = models.ForeignKey(Member, related_name='tuna_spa_member', blank=True, null=True, on_delete=models.CASCADE)
     tuna_spa_helper = models.ForeignKey(Member, related_name='tuna_spa_member_helper', blank=True, null=True, on_delete=models.CASCADE)
 
+    objects = ProjectManager()
+
     def __str__(self):
         return self.name
+
+
+class EntryManager(models.Manager):
+    pass
 
 
 class Entry(TimeStampedModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     user = models.ForeignKey(Customer, on_delete=models.CASCADE)
     canceled = models.BooleanField(default=False)
+
+    objects = EntryManager()
+
+
+class ChatMessageManager(models.Manager):
+    pass
 
 
 class ChatMessage(TimeStampedModel):
@@ -73,23 +98,20 @@ class ChatMessage(TimeStampedModel):
     message = models.TextField()
     is_draft = models.BooleanField(default=False)
 
+    objects = ChatMessageManager()
+
+
+class CancellationManager(models.Manager):
+    pass
+
 
 class Cancellation(TimeStampedModel):
     project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='cancellations')
     member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='cancellations')
     tuna_type = models.ForeignKey(UserType, on_delete=models.CASCADE, related_name='cancellations')
 
+    objects = CancellationManager()
+
     def __str__(self):
         return f"{self.project.name} - {self.member.name} - {self.tuna_type}"
-
-
-class MainTag(TimeStampedModel):
-    name = models.CharField(max_length=255)
-
-
-class SubTag(TimeStampedModel):
-    main = models.ForeignKey(MainTag, null=True, on_delete=models.SET_NULL)
-    name = models.CharField(max_length=255)
-    description = models.TextField(null=True, blank=True)
-
 

@@ -1,28 +1,34 @@
 {% extends 'base.html' %}
-{% block title %}Edit Project{% endblock %}
+{% block title %}案件作成{% endblock %}
 {% block content %}
-<h1 class="text-2xl font-bold">Edit Project</h1>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="bg-blue-500 text-white p-2 rounded">Save Changes</button>
-</form>
+	<h1 class="text-2xl font-bold">案件作成</h1>
+	<div>
+		<form method="post">
+				{% csrf_token %}
+				{{ form.as_p }}
+				<button type="submit" name="save" class="bg-blue-500 text-white p-2 rounded">保存</button>
+				<button type="submit" name="draft" class="bg-blue-500 text-white p-2 rounded">下書き保存</button>
+		</form>
+		<button name="publish" class="bg-blue-500 text-white p-2 rounded">公開</button>
+		<a href="{% url 'dashboard:project_list' %}" class="">取消</a>
+	</div>
 {% endblock %}
 {% block js_extra %}
-		$(document).ready(function() {
-				$('#id_grade').change(function() {
-						var grade_id = $(this).val();
-						if (grade_id) {
-								$.ajax({
-										url: '/get_grade_price/', // エンドポイントを適宜変更してください
-										data: {'grade_id': grade_id},
-										success: function(data) {
-												$('#id_price').val(data.price);
-										}
-								});
-						} else {
-								$('#id_price').val('');
-						}
+
+	document.querySelector('#id_categories').addEventListener('change', function() {
+		const selectedCategories = Array.from(this.selectedOptions).map(option => option.value);
+		const url = "{% url 'dashboard:get_tags' %}";
+		fetch(`${url}?categories[]=${selectedCategories.join(',')}`)
+			.then(response => response.json())
+			.then(data => {
+				const tagField = document.querySelector('#id_tags');
+				tagField.innerHTML = '';
+				data.forEach(tag => {
+					const option = document.createElement('option');
+					option.value = tag.id;
+					option.textContent = tag.name;
+					tagField.appendChild(option);
 				});
-		});
+			});
+	});
 {% endblock %}

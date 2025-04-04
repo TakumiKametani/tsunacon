@@ -20,6 +20,7 @@ def update_login_status(user, is_customer, is_member):
 
 
 def get_login_status_cache(user):
+    # いずれはCacheを使用していくが、料金かさむのでいずれ。
     login_status = LoginStatus.objects.filter(
         user=user,
     ).first()

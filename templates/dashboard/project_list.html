@@ -122,17 +122,20 @@
 		
   </div>
 
-<!-- 表示件数切り替えドロップダウン -->
-<div class="rows-per-page mb-3">
-  <label for="rowsPerPage" class="form-label">表示件数:</label>
-  <select id="rowsPerPage" class="form-select" onchange="updateTableDisplay()">
-    <option value="5">5件</option>
-    <option value="10">10件</option>
-    <option value="15">15件</option>
-    <option value="20">20件</option>
-  </select>
-</div>
-	
+	<!-- 表示件数切り替えドロップダウン -->
+	<div class="rows-per-page mb-3">
+		<label for="rowsPerPage" class="form-label">表示件数:</label>
+		<select id="rowsPerPage" class="form-select" onchange="updateTableDisplay()">
+			<option value="5">5件</option>
+			<option value="10">10件</option>
+			<option value="15">15件</option>
+			<option value="20">20件</option>
+		</select>
+	</div>
+	<!-- 案件作成 -->
+	{% if not request.login_status.is_member %}
+	<a href="{% url 'dashboard:project_create' %}" class="text-blue-500">案件を作成する</a>
+	{% endif %}
   <div class="table-responsive">
     <table class="table table-striped" id="projectTable">
       <thead>
