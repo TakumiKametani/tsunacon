@@ -1,34 +1,158 @@
 {% extends 'base.html' %}
 {% block title %}案件作成{% endblock %}
+{% block header_extra %}
+<style>
+	#tag-container {
+    max-height: 150px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+</style>
+
+{% endblock %}
 {% block content %}
-	<h1 class="text-2xl font-bold">案件作成</h1>
-	<div>
-		<form method="post">
-				{% csrf_token %}
-				{{ form.as_p }}
-				<button type="submit" name="save" class="bg-blue-500 text-white p-2 rounded">保存</button>
-				<button type="submit" name="draft" class="bg-blue-500 text-white p-2 rounded">下書き保存</button>
-		</form>
-		<button name="publish" class="bg-blue-500 text-white p-2 rounded">公開</button>
-		<a href="{% url 'dashboard:project_list' %}" class="">取消</a>
-	</div>
+    <h1 class="text-2xl font-bold">案件作成</h1>
+    <div>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                {{ form.name.label_tag }}
+                {{ form.name }}
+            </div>
+            <div class="mb-4">
+                {{ form.description.label_tag }}
+                {{ form.description }}
+            </div>
+            <div>
+                <!-- カテゴリー選択 -->
+                {{ form.categories }}
+            </div>
+
+            <div id="tag-container" class="overflow-y-scroll h-32 border rounded p-2">
+								<p class="font-semibold">関連するタグ:</p>
+								<!-- Ajaxでチェックボックスが追加されます -->
+						</div>
+            <div class="mb-4">
+                {{ form.estimated_hours.label_tag }}
+                {{ form.estimated_hours }}
+								<small id="error-estimated-hours" class="text-red-500"></small>
+            </div>
+            <div class="mb-4">
+                {{ form.start_date.label_tag }}
+                {{ form.start_date }}
+            </div>
+            <div class="mb-4">
+                {{ form.end_date.label_tag }}
+                {{ form.end_date }}
+            </div>
+						<div class="mb-4">
+                {{ form.price.label_tag }}
+                {{ form.price }}
+            </div>
+						
+            
+            <button type="submit" name="save" class="bg-blue-500 text-white p-2 rounded">保存</button>
+            <button type="submit" name="draft" class="bg-blue-500 text-white p-2 rounded">下書き保存</button>
+        </form>
+        <button name="publish" class="bg-blue-500 text-white p-2 rounded">公開</button>
+        <a href="{% url 'dashboard:project_list' %}" class="">取消</a>
+    </div>
 {% endblock %}
 {% block js_extra %}
 
-	document.querySelector('#id_categories').addEventListener('change', function() {
-		const selectedCategories = Array.from(this.selectedOptions).map(option => option.value);
-		const url = "{% url 'dashboard:get_tags' %}";
-		fetch(`${url}?categories[]=${selectedCategories.join(',')}`)
-			.then(response => response.json())
-			.then(data => {
-				const tagField = document.querySelector('#id_tags');
-				tagField.innerHTML = '';
-				data.forEach(tag => {
-					const option = document.createElement('option');
-					option.value = tag.id;
-					option.textContent = tag.name;
-					tagField.appendChild(option);
-				});
-			});
-	});
+document.querySelector('#id_categories').addEventListener('change', function() {
+    const selectedCategories = Array.from(document.querySelectorAll('input[name="categories"]:checked')).map(checkbox => checkbox.value);
+    const url = "{% url 'dashboard:get_tags' %}";
+
+    fetch(`${url}?categories[]=${selectedCategories.join(',')}`)
+        .then(response => response.json())
+        .then(data => {
+            const tagContainer = document.querySelector('#tag-container');
+            if (!tagContainer) {
+                console.error('タグコンテナ (#tag-container) が見つかりません。');
+                return;
+            }
+            
+            tagContainer.innerHTML = ''; // コンテナをクリア
+            
+            data.forEach(tag => {
+                // チェックボックスを生成
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'tags';
+                checkbox.id = `tag-${tag.id}`; // ユニークなIDを設定
+                checkbox.value = tag.id;
+                checkbox.dataset.price = tag.price; // priceをデータ属性として保存
+
+                // ラベルを生成
+                const label = document.createElement('label');
+                label.setAttribute('for', `tag-${tag.id}`); // チェックボックスのIDを参照
+                label.textContent = `${tag.name}`; // タグ名を表示
+
+                // チェックボックスとラベルをコンテナに追加
+                const div = document.createElement('div');
+                div.appendChild(checkbox);
+                div.appendChild(label);
+
+                tagContainer.appendChild(div); // タグコンテナに追加
+            });
+        });
+});
+
+function calculateTotalPrice() {
+    const checkedTags = Array.from(document.querySelectorAll('input[name="tags"]:checked'));
+    const estimatedHoursInput = document.querySelector('input[name="estimated_hours"]'); // estimated_hoursフィールドを取得
+    const priceInput = document.querySelector('input[name="price"]'); // priceフィールドを取得
+
+    // estimated_hoursの値を取得し、数値に変換
+    const estimatedHours = parseFloat(estimatedHoursInput.value);
+    if (isNaN(estimatedHours) || estimatedHours < 5) { // 5以上であることを確認
+        return;
+    }
+
+    // 選択されたタグの中で最も高い価格を取得
+    let maxPrice = 0;
+    checkedTags.forEach(tag => {
+        const price = parseFloat(tag.dataset.price); // priceをデータ属性から取得
+        if (!isNaN(price) && price > maxPrice) {
+            maxPrice = price;
+        }
+    });
+
+    // 最大金額に時間を掛けて、さらに2倍にする
+    const calculatedPrice = maxPrice * estimatedHours * 2;
+
+    // priceフィールドに計算結果を反映
+    if (priceInput) {
+        priceInput.value = calculatedPrice.toFixed(2); // 小数点以下2桁で表示
+    }
+}
+
+// タグチェックボックス変更時のイベントリスナー
+document.querySelector('#tag-container').addEventListener('change', calculateTotalPrice);
+
+// estimated_hoursの変更時のイベントリスナー
+document.querySelector('input[name="estimated_hours"]').addEventListener('input', calculateTotalPrice);
+
+document.querySelector('#id_estimated_hours').addEventListener('input', function() {
+    const value = parseFloat(this.value);
+    if (value < 5) {
+        this.value = 5; // 最小値を直接補正
+        // エラーメッセージを追加する場合（オプション）
+        const errorDisplay = document.querySelector('#error-estimated-hours');
+        if (errorDisplay) {
+            errorDisplay.textContent = '見込時間は5以上に補正されました。';
+        }
+    } else {
+        // エラーをクリア
+        const errorDisplay = document.querySelector('#error-estimated-hours');
+        if (errorDisplay) {
+            errorDisplay.textContent = '';
+        }
+    }
+});
+
 {% endblock %}

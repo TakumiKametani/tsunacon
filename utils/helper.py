@@ -5,7 +5,7 @@ from django.http import Http404
 
 
 def is_admin(user):
-    return user.is_superuser
+    return user.is_staff
 
 
 def update_login_status(user, is_customer, is_member):

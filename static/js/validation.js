@@ -4,7 +4,7 @@ import validator from 'https://cdn.jsdelivr.net/npm/validator@latest/+esm';
 export function loginValidationCheck(emailInput,passwordInput,adminSignInButton) {
 
     // emailの入力チェック
-    emailInput.addEventListener("input", function () {
+    emailInput.addEventListener("blur", function () {
         let passwordValue = passwordInput.value;
         let emailValue = emailInput.value;
 
@@ -13,7 +13,7 @@ export function loginValidationCheck(emailInput,passwordInput,adminSignInButton)
         } else {
             emailInput.classList.add("is-invalid");
         }
-        if (validator.isEmail(emailValue) && validator.isEmpty(passwordValue)) {
+        if (validator.isEmail(emailValue) && !validator.isEmpty(passwordValue)) {
             adminSignInButton.disabled = false;
             adminSignInButton.classList.remove("btn-secondary")
         }else{
@@ -23,7 +23,7 @@ export function loginValidationCheck(emailInput,passwordInput,adminSignInButton)
     });
 
     // passwordの入力チェック
-    passwordInput.addEventListener("input", function () {
+    passwordInput.addEventListener("blur", function () {
         let passwordValue = passwordInput.value;
         let emailValue = emailInput.value;
         if(!validator.isEmpty(passwordValue)){
@@ -32,7 +32,7 @@ export function loginValidationCheck(emailInput,passwordInput,adminSignInButton)
             passwordInput.classList.add("is-invalid");
         }
 
-        if (validator.isEmail(emailValue) && validator.isEmpty(passwordValue)) {
+        if (validator.isEmail(emailValue) && !validator.isEmpty(passwordValue)) {
             adminSignInButton.disabled = false;
             adminSignInButton.classList.remove("btn-secondary")
         }else{

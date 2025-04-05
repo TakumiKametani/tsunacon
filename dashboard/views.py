@@ -84,7 +84,11 @@ class ChatMessageDeleteView(View, LoginRequiredMixin):
 
 
 def get_tags(request):
-    category_ids = request.GET.getlist('categories[]')
-    tags = Tag.objects.filter(categories__id__in=category_ids).distinct()
-    data = [{'id': tag.id, 'name': tag.name} for tag in tags]
+    try:
+        category_ids = [int(cid) for cid in request.GET.getlist('categories[]')[0].split(',') if cid.isdigit()]
+    except ValueError:
+        category_ids = []
+
+    tags = Tag.objects.filter(category__id__in=category_ids).distinct()
+    data = [{'id': tag.id, 'name': tag.name, 'price': tag.price} for tag in tags]
     return JsonResponse(data, safe=False)

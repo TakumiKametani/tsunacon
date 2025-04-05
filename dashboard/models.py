@@ -24,6 +24,20 @@ STATUS = [
 ]
 
 
+class CategoryManager(models.Manager):
+    pass
+
+
+class Category(TimeStampedModel):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+
+    objects = CategoryManager()
+
+    def __str__(self):
+        return self.name
+
+
 class TagManager(models.Manager):
     pass
 
@@ -32,20 +46,12 @@ class Tag(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
+    category = models.ForeignKey(Category, related_name="categories", on_delete=models.CASCADE)
 
     objects = TagManager()
 
-
-class CategoryManager(models.Manager):
-    pass
-
-
-class Category(TimeStampedModel):
-    name = models.CharField(max_length=255)
-    description = models.TextField()
-    tags = models.ManyToManyField(Tag, related_name="categories")
-
-    objects = CategoryManager()
+    def __str__(self):
+        return self.name
 
 
 class ProjectManager(models.Manager):
