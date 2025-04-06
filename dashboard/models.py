@@ -46,7 +46,7 @@ class Tag(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    category = models.ForeignKey(Category, related_name="categories", on_delete=models.CASCADE)
+    categories = models.ForeignKey(Category, related_name="categories", on_delete=models.CASCADE)
 
     objects = TagManager()
 
@@ -61,11 +61,11 @@ class ProjectManager(models.Manager):
 class Project(TimeStampedModel):
     name = models.CharField(max_length=255)
     description = models.TextField()
-    category = models.ForeignKey(Category, null=True, blank=True, on_delete=models.SET_NULL)
+    categories = models.ManyToManyField(Category)
     tags = models.ManyToManyField(Tag)
     grade = models.PositiveSmallIntegerField(max_length=10, null=True, blank=True)
     estimated_hours = models.IntegerField(help_text="見込時間（時間単位）")
-    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    customer = models.ForeignKey(Customer, null=True, blank=True, on_delete=models.CASCADE)
     client_name = models.CharField(max_length=255)
     start_date = models.DateField()
     end_date = models.DateField()

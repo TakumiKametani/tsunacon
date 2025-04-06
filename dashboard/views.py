@@ -36,7 +36,12 @@ class ProjectUpdateView(UpdateView, LoginRequiredMixin):
     model = Project
     form_class = ProjectForm
     template_name = 'dashboard/project_form.html'
-    success_url = reverse_lazy('project_list')
+    success_url = reverse_lazy('dashboard:project_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request  # requestをフォームに渡す
+        return kwargs
 
 
 @method_decorator(with_login_status, name='dispatch')
@@ -44,7 +49,12 @@ class ProjectCreateView(CreateView, LoginRequiredMixin):
     model = Project
     form_class = ProjectForm
     template_name = 'dashboard/project_form.html'
-    success_url = reverse_lazy('project_list')
+    success_url = reverse_lazy('dashboard:project_list')
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['request'] = self.request  # requestをフォームに渡す
+        return kwargs
 
 
 @method_decorator(with_login_status, name='dispatch')

@@ -92,9 +92,15 @@ class UserBaseModel(models.Model):
         abstract = True
 
 
+class UserTypeManager(models.Manager):
+    pass
+
+
 class UserType(TimeStampedModel):
     type_id = models.CharField(unique=True, max_length=10)
     name = models.CharField(max_length=50)
+
+    objects = UserTypeManager()
 
     def __str__(self):
         return self.name
@@ -134,6 +140,10 @@ class Member(UserBaseModel, TimeStampedModel):
         ]
 
 
+class MemberProfileManager(models.Manager):
+    pass
+
+
 class MemberProfile(TimeStampedModel):
     member = models.ForeignKey(Member, related_name='member', on_delete=models.CASCADE)
     gender = models.CharField(max_length=2, choices=GENDER_TYPE)
@@ -141,7 +151,13 @@ class MemberProfile(TimeStampedModel):
     description = models.TextField(null=True, blank=True, help_text='簡易的な経歴等の記載', verbose_name='自己PR')
     port_folio = models.URLField(null=True, blank=True)
     resume = models.FileField(upload_to=get_upload_to_resume, null=True, blank=True)  # 動的パス
-    
+
+
+    objects = MemberProfileManager()
+
+class CustomerManager(models.Manager):
+    pass
+
 
 class Customer(UserBaseModel, TimeStampedModel):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='customer_profiles')
@@ -156,14 +172,23 @@ class Customer(UserBaseModel, TimeStampedModel):
     is_active = models.BooleanField(default=False)
     is_terminated = models.BooleanField(default=False)
 
+    objects = CustomerManager()
+
     def __str__(self):
         return f"{self.customer_type} - {self.name}"
+
+
+class LoginStatusManager(models.Manager):
+    pass
 
 
 class LoginStatus(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     is_customer = models.BooleanField(default=False)
     is_member = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
+
+    objects = LoginStatusManager()
 
 
 class BankAccount(TimeStampedModel):
@@ -177,14 +202,24 @@ class BankAccount(TimeStampedModel):
         abstract = True
 
 
+class CustomerBankAccountManager(models.Manager):
+    pass
+
+
 class CustomerBankAccount(BankAccount):
     '''
     バーチャル口座番号を発行するので、顧客に支払いをしてもらう口座紐づきテーブル
     '''
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='customer_bank')
 
+    objects = CustomerBankAccountManager()
+
     def __str__(self):
         return f"{self.customer} - {self.account_number} ({self.get_account_type_display()})"
+
+
+class MemberBankAccountManager(models.Manager):
+    pass
 
 
 class MemberBankAccount(BankAccount):
@@ -192,14 +227,23 @@ class MemberBankAccount(BankAccount):
     つな○○に報酬を支払うための口座紐づきテーブル
     '''
     member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='member_bank')
+
+    objects = MemberBankAccountManager()
+
     def __str__(self):
         return f"{self.member} - {self.bank_name} - {self.account_number}"
+
+
+class DiscountManager(models.Manager):
+    pass
 
 
 class Discount(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name='discounts')
     discount_amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # 数値指定の値引き
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)  # 割合での値引き
+
+    objects = DiscountManager()
 
     def apply_discount(self, original_price):
         if self.discount_amount:

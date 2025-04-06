@@ -66,11 +66,11 @@ class ProjectCreateView(View, LoginRequiredMixin):
     template_name = 'departments/project_form.html'
 
     def get(self, request):
-        form = ProjectForm()
+        form = ProjectForm(request=request)
         return render(request, self.template_name, {'form': form})
 
     def post(self, request):
-        form = ProjectForm(request.POST)
+        form = ProjectForm(request.POST, request=request)
         if form.is_valid():
             project = form.save()
             return redirect('project_success')

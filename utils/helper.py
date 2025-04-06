@@ -8,12 +8,12 @@ def is_admin(user):
     return user.is_staff
 
 
-def update_login_status(user, is_customer, is_member):
+def update_login_status(user, is_customer, is_member, is_admin):
 
     # LoginStatusモデルを更新
     login_status, created = LoginStatus.objects.update_or_create(
         user=user,
-        defaults={'is_customer': is_customer, 'is_member': is_member}
+        defaults={'is_customer': is_customer, 'is_member': is_member, 'is_admin': is_admin}
     )
 
     return login_status

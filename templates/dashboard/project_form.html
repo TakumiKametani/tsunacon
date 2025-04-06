@@ -26,6 +26,10 @@
                 {{ form.description.label_tag }}
                 {{ form.description }}
             </div>
+						<div class="mb-4">
+                {{ form.client_name.label_tag }}
+                {{ form.client_name }}
+            </div>
             <div>
                 <!-- カテゴリー選択 -->
                 {{ form.categories }}
@@ -52,12 +56,9 @@
                 {{ form.price.label_tag }}
                 {{ form.price }}
             </div>
-						
-            
-            <button type="submit" name="save" class="bg-blue-500 text-white p-2 rounded">保存</button>
+            <button type="submit" name="save" class="bg-blue-500 text-white p-2 rounded">登録完了(受諾前の場合、編集はできます)</button>
             <button type="submit" name="draft" class="bg-blue-500 text-white p-2 rounded">下書き保存</button>
         </form>
-        <button name="publish" class="bg-blue-500 text-white p-2 rounded">公開</button>
         <a href="{% url 'dashboard:project_list' %}" class="">取消</a>
     </div>
 {% endblock %}
@@ -127,7 +128,7 @@ function calculateTotalPrice() {
 
     // priceフィールドに計算結果を反映
     if (priceInput) {
-        priceInput.value = calculatedPrice.toFixed(2); // 小数点以下2桁で表示
+        priceInput.value = calculatedPrice.toFixed(0);
     }
 }
 

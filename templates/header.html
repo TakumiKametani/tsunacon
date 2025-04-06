@@ -63,6 +63,14 @@
                 {{ request.user.username }}
               </a>
             </li>
+						<li>
+							<form action="{% url 'account:logout' %}" method="post">
+								{% csrf_token %}
+              <button type="submit" class="nav-link text-white">
+                logout
+              </button>
+								</form>
+            </li>
           </ul>
         </div>
       </div>

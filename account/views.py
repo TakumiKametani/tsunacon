@@ -38,6 +38,12 @@ class AdminLoginView(LoginView):
     form_class = forms.LoginForm
     template_name = "account/admin_login.html"
 
+    def form_valid(self, form):
+        user = form.get_user()
+        # ログインタイプを判別して更新
+        update_login_status(user, is_customer=False, is_member=False, is_admin=True)
+        return super().form_valid(form)
+
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect(self.get_success_url())
@@ -51,8 +57,8 @@ class CustomerLoginView(LoginView):
     def form_valid(self, form):
         user = form.get_user()
         # ログインタイプを判別して更新
-        update_login_status(user, is_customer=True, is_member=False)
-        return redirect(self.get_success_url())
+        update_login_status(user, is_customer=True, is_member=False, is_admin=False)
+        return super().form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
@@ -67,8 +73,8 @@ class MemberLoginView(LoginView):
     def form_valid(self, form):
         user = form.get_user()
         # ログインタイプを判別して更新
-        update_login_status(user, is_customer=False, is_member=True)
-        return redirect(self.get_success_url())
+        update_login_status(user, is_customer=False, is_member=True, is_admin=False)
+        return super().form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:

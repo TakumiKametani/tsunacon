@@ -175,7 +175,7 @@
         </tr>
 				{% for project in projects %}
 					<tr>
-						<td>{{ project.name }}</td>
+						<td><a href="{% url 'dashboard:project_detail' pk=project.pk %}" class="text-decoration-none text-primary">{{ project.name }}</a></td>
 						<td>{{ project.description }}</td>
 						<td>{{ project.customer.name }}</td>
 						<td>{{ project.start_date }}</td>
