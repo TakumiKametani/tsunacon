@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-2xl font-bold">Invoice Detail</h2>
+<p><strong>Client Name:</strong> {{ object.client_name }}</p>
+<p><strong>Client Address:</strong> {{ object.client_address }}</p>
+<p><strong>Issue Date:</strong> {{ object.issue_date }}</p>
+<p><strong>Due Date:</strong> {{ object.due_date }}</p>
+<p><strong>Total Amount:</strong> {{ object.total_amount }}</p>
+<a href="{% url 'invoice_create' %}" class="text-blue-500">Create another invoice</a>
+{% endblock %}

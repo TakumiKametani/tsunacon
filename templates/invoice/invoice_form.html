@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2 class="text-2xl font-bold">Create Invoice</h2>
-<form method="post">
+<form method="post" action="{% url 'invoice:invoice_create' %}">
     {% csrf_token %}
     {{ form.as_p }}
     <button type="submit" class="bg-blue-500 text-white p-2 rounded">Create Invoice</button>

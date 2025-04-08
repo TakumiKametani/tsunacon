@@ -63,7 +63,7 @@ class Project(TimeStampedModel):
     description = models.TextField()
     categories = models.ManyToManyField(Category)
     tags = models.ManyToManyField(Tag)
-    grade = models.PositiveSmallIntegerField(max_length=10, null=True, blank=True)
+    grade = models.PositiveSmallIntegerField(null=True, blank=True)
     estimated_hours = models.IntegerField(help_text="見込時間（時間単位）")
     customer = models.ForeignKey(Customer, null=True, blank=True, on_delete=models.CASCADE)
     client_name = models.CharField(max_length=255)

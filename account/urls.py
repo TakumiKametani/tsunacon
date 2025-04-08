@@ -24,19 +24,14 @@ urlpatterns = [
     path('member_self_registration/edit/<int:pk>/', views.MemberSelfRegistrationDetailView.as_view(), name='member_self_registration_detail'),
     path('registration_success/', views.registration_success, name='registration_success'),
     # パスワード変更
-    path('password-change/', views.CustomPasswordChangeView.as_view(), name='password_change'),
-    path('password-change-done/', views.CustomPasswordChangeDoneView.as_view(), name='password_change_done'),
+    path('password_change/', views.CustomPasswordChangeView.as_view(), name='password_change'),
+    path('password_change_done/', views.CustomPasswordChangeDoneView.as_view(), name='password_change_done'),
 
     # パスワードリセット
-    path('password-reset/', views.CustomPasswordResetView.as_view(), name='password_reset'),
-    path('password-reset-done/', views.CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
-    path('password-reset-confirm/<uidb64>/<token>/', views.CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    path('password-reset-complete/', views.CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    path('password_reset/', views.CustomPasswordResetView.as_view(), name='password_reset'),
+    path('password_reset_done/', views.CustomPasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('password_reset_confirm/<uidb64>/<token>/', views.CustomPasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('password_reset_complete/', views.CustomPasswordResetCompleteView.as_view(), name='password_reset_complete'),
     # 銀行口座登録
-    path('customer_bank_account/create/', views.CustomerBankAccountCreateView.as_view(), name='customer_bank_account_create'),
-    path('customer_bank_account/edit/<int:pk>/', views.CustomerBankAccountEditView.as_view(), name='customer_bank_account_edit'),
-    path('member_bank_account/create/', views.MemberBankAccountCreateView.as_view(), name='member_bank_account_create'),
-    path('member_bank_account/edit/<int:pk>/', views.MemberBankAccountEditView.as_view(), name='member_bank_account_edit'),
-    path('bank_account/success/', views.bank_account_success, name='bank_account_success'),
     path('get_branches/', views.get_branches, name='get_branches'),
 ]

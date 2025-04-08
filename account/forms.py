@@ -423,6 +423,7 @@ class MemberRegistrationDetailForm(forms.ModelForm):
 
         return member
 
+
 class MemberSelfRegistrationDetailForm(forms.ModelForm):
     last_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
     first_name_kana = forms.CharField(max_length=255, validators=[validate_katakana])
@@ -504,44 +505,4 @@ class ServiceUseAgreementUploadForm(forms.ModelForm):
     class Meta:
         model = ServiceUseAgreement
         fields = ['contract_file']
-
-
-class CustomerBankAccountForm(forms.ModelForm):
-    bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名')
-    branch_name = forms.ChoiceField(label='支店名')
-
-    class Meta:
-        model = CustomerBankAccount
-        fields = ['bank_name', 'branch_name', 'account_number', 'account_holder']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'bank_name' in self.data:
-            self.fields['branch_name'].choices = get_branch_list(self.data['bank_name'])
-        elif self.instance.pk:
-            self.fields['branch_name'].choices = get_branch_list(self.instance.bank_name)
-
-
-class MemberBankAccountForm(forms.ModelForm):
-    bank_name = forms.ChoiceField(choices=get_bank_list(), label='銀行名')
-    branch_name = forms.ChoiceField(label='支店名')
-
-    class Meta:
-        model = MemberBankAccount
-        fields = ['bank_name', 'branch_name', 'account_number', 'account_holder']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if 'bank_name' in self.data:
-            self.fields['branch_name'].choices = get_branch_list(self.data['bank_name'])
-        elif self.instance.pk:
-            self.fields['branch_name'].choices = get_branch_list(self.instance.bank_name)
-
-
-
-
-
-
-
-
 

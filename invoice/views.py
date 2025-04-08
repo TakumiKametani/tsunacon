@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
-from django.views.generic import CreateView, DetailView
+from django.views.generic import CreateView, DetailView, View
 from .models import Invoice
 from .forms import InvoiceForm
 from io import BytesIO
@@ -10,16 +10,27 @@ from django.conf import settings
 import os
 
 from django.utils.decorators import method_decorator
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required, user_passes_test
 from utils.helper import is_admin
+from utils.helper import with_login_status
 
 
-@method_decorator([login_required, user_passes_test(is_admin)], name='dispatch')
+@method_decorator([login_required, user_passes_test(is_admin), with_login_status], name='dispatch')
+class InvoiceListView(View):
+    template_name = 'invoice/invoice_list.html'
+
+    def get(self, request):
+        invoices = Invoice.objects.all()
+        return render(request, self.template_name, {'invoices': invoices})
+
+
+@method_decorator([login_required, user_passes_test(is_admin), with_login_status], name='dispatch')
 class InvoiceCreateView(CreateView):
     model = Invoice
     form_class = InvoiceForm
-    template_name = 'invoices/invoice_form.html'
-    success_url = '/invoices/'
+    template_name = 'invoice/invoice_form.html'
+    success_url = '/invoice/'
 
     def form_valid(self, form):
         invoice = form.save()
@@ -51,6 +62,11 @@ class InvoiceCreateView(CreateView):
         buffer.close()
 
 
+@method_decorator([login_required, user_passes_test(is_admin), with_login_status], name='dispatch')
 class InvoiceDetailView(DetailView):
     model = Invoice
     template_name = 'invoices/invoice_detail.html'
+
+
+def registration_success(request):
+    return render(request, 'invoice/registration_success.html')

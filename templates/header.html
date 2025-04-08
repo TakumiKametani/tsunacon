@@ -21,6 +21,12 @@
                 会員本登録
               </a>
             </li>
+						<li>
+              <a href="{% url 'invoice:invoice_create' %}" class="nav-link {% if 'invoice' in request.path %}text-secondary{% else %}text-white{% endif %}">
+                <img src="{% static 'image/icon/info.svg' %}" class="bi d-block mx-auto mb-1" width="24" height="24">
+                請求書作成
+              </a>
+            </li>
 						
 						{% endif %}
 						<li>

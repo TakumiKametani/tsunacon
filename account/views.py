@@ -15,11 +15,17 @@ from . import forms
 from django.shortcuts import render, redirect, reverse
 from django.views import View
 from django.http.response import JsonResponse
-from .models import LoginStatus, CustomerBankAccount, MemberBankAccount
 
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.utils.decorators import method_decorator
-from .forms import CustomerRegistrationDetailForm, MemberRegistrationDetailForm, MemberSelfRegistrationDetailForm, OutsourcingAgreementUploadForm, ServiceUseAgreementUploadForm, ConfidentialityAgreementUploadForm
+from .forms import (
+    CustomerRegistrationDetailForm,
+    MemberRegistrationDetailForm,
+    MemberSelfRegistrationDetailForm,
+    OutsourcingAgreementUploadForm,
+    ServiceUseAgreementUploadForm,
+    ConfidentialityAgreementUploadForm
+)
 
 from utils.zengin_code_utils import get_branch_list
 from account.models import Customer, Member, CUSTOMER_TYPES
@@ -31,6 +37,14 @@ from utils.helper import update_login_status, with_login_status, is_admin
 
 class TopView(TemplateView):
     template_name = "account/top.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            return redirect(self.get_success_url())
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('dashboard:project_list')
 
 
 class AdminLoginView(LoginView):
@@ -171,7 +185,7 @@ class CustomerRegistrationDetailView(UpdateView):
         # 既存の context データを取得
         context = super().get_context_data(**kwargs)
         # カスタムデータを追加
-        context['customer'] = self.form_class(instance=self.object)  # 詳細表示用フォーム
+        context['customer'] = self.form_class(instance=self.object)
         context['customer_types'] = CUSTOMER_TYPES
         return context
 
@@ -244,80 +258,9 @@ class MemberSelfRegistrationDetailView(UpdateView):
         return reverse('account:registration_success')
 
 
-
-
-
 def registration_success(request):
     return render(request, 'account/registration_success.html')
 
-
-class CustomerBankAccountCreateView(View):
-    template_name = 'account/bank_account_form.html'
-
-    def get(self, request):
-        form = forms.CustomerBankAccountForm()
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request):
-        form = forms.CustomerBankAccountForm(request.POST)
-        if form.is_valid():
-            bank_account = form.save(commit=False)
-            bank_account.save()
-            return redirect('account:bank_account_success')
-        return render(request, self.template_name, {'form': form})
-
-class CustomerBankAccountEditView(View):
-    template_name = 'account/bank_account_form.html'
-
-    def get(self, request, pk):
-        bank_account = CustomerBankAccount.objects.get(pk=pk, user=request.user)
-        form = forms.CustomerBankAccountForm(instance=bank_account)
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request, pk):
-        form = forms.CustomerBankAccountForm(request.POST)
-        if form.is_valid():
-            bank_account = form.save(commit=False)
-            bank_account.save()
-            return redirect('account:bank_account_success')
-        return render(request, self.template_name, {'form': form})
-
-
-class MemberBankAccountCreateView(View):
-    template_name = 'account/bank_account_form.html'
-
-    def get(self, request):
-        form = forms.MemberBankAccountForm()
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request):
-        form = forms.MemberBankAccountForm(request.POST)
-        if form.is_valid():
-            bank_account = form.save(commit=False)
-            bank_account.save()
-            return redirect('account:bank_account_success')
-        return render(request, self.template_name, {'form': form})
-
-class MemberBankAccountEditView(View):
-    template_name = 'account/bank_account_form.html'
-
-    def get(self, request, pk):
-        bank_account = MemberBankAccount.objects.get(pk=pk, user=request.user)
-        form = forms.MemberBankAccountForm(instance=bank_account)
-        return render(request, self.template_name, {'form': form})
-
-    def post(self, request, pk):
-        form = forms.MemberBankAccountForm(request.POST)
-        if form.is_valid():
-            bank_account = form.save(commit=False)
-            bank_account.save()
-            return redirect('account:bank_account_success')
-        return render(request, self.template_name, {'form': form})
-
-
-
-def bank_account_success(request):
-    return render(request, 'account/bank_account_success.html')
 
 def get_branches(request):
     bank_code = request.GET.get('bank_code')

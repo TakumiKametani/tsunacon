@@ -8,6 +8,9 @@ from .forms import ProjectForm, ChatMessageForm
 from django.http import JsonResponse
 from utils.helper import update_login_status,with_login_status
 from django.utils.decorators import method_decorator
+from account.models import Customer
+from django.db.models import Q
+
 
 
 @method_decorator(with_login_status, name='dispatch')
@@ -15,7 +18,15 @@ class ProjectListView(View, LoginRequiredMixin):
     template_name = 'dashboard/project_list.html'
 
     def get(self, request):
-        projects = Project.objects.all()
+        if request.login_status.is_customer:
+            # 顧客は、自案件のみを表示
+            projects = Project.objects.filter(customer=Customer.objects.get(user=request.user))
+        elif request.login_status.is_member:
+            # TODO メンバーの場合は、つなコン権限を持っている方はすべて表示、つなスパのみの方には、案件登録完了フラグが立っているもの、担当になったものを表示
+            projects = Project.objects.all()
+        else:
+            # 管理者権限はすべて表示
+            projects = Project.objects.all()
         return render(request, self.template_name, {'projects': projects})
 
 
@@ -29,19 +40,6 @@ class ProjectDetailView(DetailView, LoginRequiredMixin):
         context['chat_messages'] = ChatMessage.objects.filter(project=self.object, is_draft=False)
         context['chat_form'] = ChatMessageForm()
         return context
-
-
-@method_decorator(with_login_status, name='dispatch')
-class ProjectUpdateView(UpdateView, LoginRequiredMixin):
-    model = Project
-    form_class = ProjectForm
-    template_name = 'dashboard/project_form.html'
-    success_url = reverse_lazy('dashboard:project_list')
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs['request'] = self.request  # requestをフォームに渡す
-        return kwargs
 
 
 @method_decorator(with_login_status, name='dispatch')
